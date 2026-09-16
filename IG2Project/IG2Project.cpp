@@ -84,7 +84,7 @@ void IG2Project::setupScene(void) {
     //------------------------------------------------------------------------
     // Creating the light
 
-    //mSM->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
+    mSM->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
     
     Light* luz = mSM->createLight("Luz");
     luz->setType(Ogre::Light::LT_DIRECTIONAL);
@@ -98,18 +98,18 @@ void IG2Project::setupScene(void) {
     //------------------------------------------------------------------------
     // Creating Sinbad
 
-    //Ogre::Entity* ent = mSM->createEntity("Sinbad.mesh");
-    //mSinbadNode = mSM->getRootSceneNode()->createChildSceneNode("nSinbad");
-    //mSinbadNode->attachObject(ent);
+    Ogre::Entity* ent = mSM->createEntity("Sinbad.mesh");
+    mSinbadNode = mSM->getRootSceneNode()->createChildSceneNode("nSinbad");
+    mSinbadNode->attachObject(ent);
 
     // Show bounding box
-    //mSinbadNode->showBoundingBox(true);
+    mSinbadNode->showBoundingBox(true);
 
     // Set position of Sinbad
     //mSinbadNode->setPosition(x, y, z);
 
     // Set scale of Sinbad
-    //mSinbadNode->setScale(20, 20, 20);
+    mSinbadNode->setScale(20, 20, 20);
 
     //mSinbadNode->yaw(Ogre::Degree(-45));
     //mSinbadNode->setVisible(false);    
