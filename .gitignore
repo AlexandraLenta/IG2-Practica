@@ -1,0 +1,37 @@
+# Ignore everything
+*
+
+# ...but let Git descend into directories so the rules below can match
+!*/
+
+# Keep source files
+!*.cpp
+!*.h
+
+# Keep solution and configurations
+!*.sln
+!*.vcxproj
+!*.vcxproj.filters
+
+# Keep the IG2Media folder and everything inside it
+!IG2Project/IG2Media/**
+
+# Keep this file
+!.gitignore
+
+# Re-ignore IDE/build output entirely, in case it contains .cpp or .h
+.vs/
+Win32/
+Debug/
+Release/
+out/
+
+# Keep resources.cfg file
+x64/*
+!x64/Debug/
+x64/Debug/*
+!x64/Debug/resources.cfg
+
+!x64/Release/
+x64/Release/*
+!x64/Release/resources.cfg
