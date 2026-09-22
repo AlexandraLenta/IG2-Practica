@@ -17,6 +17,7 @@
 #include <OgreWindowEventUtilities.h>
 #include <SDL_keycode.h>
 
+static const std::string MAP_NAME = "../../IG2Project/IG2Project/IG2Media/stage1.txt";
 
 class IG2Project: public OgreBites::ApplicationContext, OgreBites::InputListener {
 
@@ -30,7 +31,6 @@ protected:
     virtual void shutdown();
     virtual void setupScene();
 
-
     Ogre::SceneNode* mSinbadNode = nullptr;
 
     Ogre::SceneManager* mSM = nullptr;
@@ -42,6 +42,12 @@ protected:
 
     Ogre::SceneNode* mCamNode = nullptr;
     OgreBites::CameraMan* mCamMgr = nullptr;
+
+private:
+    void createCamera();
+    void createLights();
+    void createFloor();
+    void createLabyrinth();
 };
 
 #endif

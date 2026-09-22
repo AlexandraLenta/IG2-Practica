@@ -1,4 +1,5 @@
 #include "IG2Project.h"
+#include "Labyrinth.h"
 
 using namespace std;
 using namespace Ogre;
@@ -58,9 +59,13 @@ void IG2Project::setup(void) {
 
 void IG2Project::setupScene(void) {
 
-    //------------------------------------------------------------------------
-    // Creating the camera
+    createCamera();
+    createLights();
+    createFloor();
+    createLabyrinth();
+}
 
+void IG2Project::createCamera() {
     Camera* cam = mSM->createCamera("Cam");
     cam->setNearClipDistance(1);
     cam->setFarClipDistance(10000);
@@ -73,19 +78,17 @@ void IG2Project::setupScene(void) {
     mCamNode->setPosition(0, 0, 1000);
     mCamNode->lookAt(Ogre::Vector3(0, 0, 0), Ogre::Node::TS_WORLD);
 
-    // and tell it to render into the main window
+    // tell it to render into the main window
     Viewport* vp = getRenderWindow()->addViewport(cam);
 
     mCamMgr = new OgreBites::CameraMan(mCamNode);
     addInputListener(mCamMgr);
     mCamMgr->setStyle(OgreBites::CS_ORBIT);
+}
 
-
-    //------------------------------------------------------------------------
-    // Creating the light
-
+void IG2Project::createLights() {
     mSM->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
-    
+
     Light* luz = mSM->createLight("Luz");
     luz->setType(Ogre::Light::LT_DIRECTIONAL);
     luz->setDiffuseColour(0.75, 0.75, 0.75);
@@ -93,58 +96,20 @@ void IG2Project::setupScene(void) {
     mLightNode = mSM->getRootSceneNode()->createChildSceneNode("nLuz");
     mLightNode->attachObject(luz);
     mLightNode->setDirection(Ogre::Vector3(-1, -1, -1));
- 
+}
 
-    //------------------------------------------------------------------------
-    // Creating Sinbad
+void IG2Project::createFloor() {
+    MeshManager::getSingleton().createPlane("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+        Plane(Vector3::UNIT_Y, 0),
+        1500, 1500, 50, 50, true, 1, 5, 5,
+        Vector3::UNIT_Z);
 
-    Ogre::Entity* ent = mSM->createEntity("Sinbad.mesh");
-    mSinbadNode = mSM->getRootSceneNode()->createChildSceneNode("nSinbad");
-    mSinbadNode->attachObject(ent);
+    Entity* entFloor = mSM->createEntity("exampleFloor", "floor");
+    entFloor->setMaterialName("example/stonesFloor");
+    SceneNode* floorNode = mSM->getRootSceneNode()->createChildSceneNode();
+    floorNode->attachObject(entFloor);
+}
 
-    // Show bounding box
-    mSinbadNode->showBoundingBox(true);
-
-    // Set position of Sinbad
-    //mSinbadNode->setPosition(x, y, z);
-
-    // Set scale of Sinbad
-    mSinbadNode->setScale(20, 20, 20);
-
-    //mSinbadNode->yaw(Ogre::Degree(-45));
-    //mSinbadNode->setVisible(false);    
-
-
-    //------------------------------------------------------------------------
-    // Creating the floor
-
-    //MeshManager::getSingleton().createPlane("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-    //    Plane(Vector3::UNIT_Y, 0),
-    //    1500, 1500, 50, 50, true, 1, 5, 5,
-    //    Vector3::UNIT_Z);
-
-    //Entity* entFloor = mSM->createEntity("exampleFloor", "floor");
-    //entFloor->setMaterialName("example/stonesFloor");
-    //SceneNode* floorNode = mSM->getRootSceneNode()->createChildSceneNode();
-    //floorNode->attachObject(entFloor);
-
-
-    //------------------------------------------------------------------------
-   // Creating the dragon
-
-    Ogre::Entity* entDragon = mSM->createEntity("dragon.mesh");
-    Ogre::SceneNode* mDragonNode = mSM->getRootSceneNode()->createChildSceneNode("nDragon");
-    mDragonNode->attachObject(entDragon);
-
-    // Show bounding box
-    mDragonNode->showBoundingBox(true);
-
-    // Set position of the dragon
-    //mDragonNode->setPosition(x, y, z);
-
-    // Set scale of the dragon
-    //mDragonNode->setScale(20, 20, 20);
-
-    //mDragonNode->yaw(Ogre::Degree(-45));
-    //mDragonNode->setVisible(false);
+void IG2Project::createLabyrinth() {
+    Labyrinth* labyrinth = new Labyrinth({ 0, 0, 0 }, mSM->getRootSceneNode()->createChildSceneNode("labyrinth"), mSM, MAP_NAME);
 }

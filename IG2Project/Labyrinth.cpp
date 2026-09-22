@@ -21,16 +21,18 @@ void Labyrinth::createLabyrinth(string fileName) {
 
 	file >> numRows >> numCols;
 
+	Vector3 nextPos = getPosition();
+
 	while (iRow < numRows) {
 		iCol = 0;
 		while (iCol < numCols) {
 			file >> cell;
 
 			if (cell == WALL_BLOCK) {
-				// create wall block
+				createWallBlock(nextPos);
 			}
 			else if (cell == EMPTY_BLOCK) {
-				// create empty block
+				createEmptyBlock(nextPos);
 			}
 			iCol++;
 		}
@@ -38,4 +40,30 @@ void Labyrinth::createLabyrinth(string fileName) {
 	}
 
 	file.close();
+}
+
+void Labyrinth::createWallBlock(Vector3 pos) {
+	SceneNode* wall = createChildSceneNode();
+
+	IG2Object* wallObj = new IG2Object(pos + Vector3{0, Labyrinth::BLOCK_SIZE/2., 0}, wall, mSM, "cube.mesh");
+	wallObj->setScale(getCubeScale(wallObj));
+
+	_blocks.push_back(wallObj); 
+}
+
+void Labyrinth::createEmptyBlock(Vector3 pos) {
+	SceneNode* empty = createChildSceneNode();
+
+	IG2Object* emptyObj = new IG2Object(pos, empty, mSM);
+	emptyObj->setScale(getCubeScale(emptyObj));
+
+	_blocks.push_back(emptyObj);
+}
+
+Vector3 Labyrinth::getCubeScale(IG2Object* cube) {
+	auto x = Labyrinth::BLOCK_SIZE / (float)cube->calculateBoxSize().x;
+	auto y = Labyrinth::BLOCK_SIZE / (float)cube->calculateBoxSize().y;
+	auto z = Labyrinth::BLOCK_SIZE / (float)cube->calculateBoxSize().z;
+
+	return { x, y, z };
 }
