@@ -8,6 +8,14 @@ Labyrinth::Labyrinth(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, s
 	createLabyrinth(fileName);
 }
 
+Labyrinth::~Labyrinth() {
+	for (auto* b : _blocks) {
+		delete b;
+	}
+
+	_blocks.clear();
+}
+
 void Labyrinth::createLabyrinth(string fileName) {
 	ifstream file;
 	file.open(fileName);
@@ -21,7 +29,9 @@ void Labyrinth::createLabyrinth(string fileName) {
 
 	file >> numRows >> numCols;
 
-	Vector3 nextPos = getPosition();
+	Vector3 absoluteStartingPos = { -(float)(numCols*BLOCK_SIZE)/2.f, 0, -(float)(numRows*BLOCK_SIZE)/2.f };
+	Vector3 initialPos = { getPosition().x + absoluteStartingPos.x, 0, getPosition().z + absoluteStartingPos.z };
+	Vector3 nextPos = initialPos;
 
 	while (iRow < numRows) {
 		iCol = 0;
@@ -35,8 +45,11 @@ void Labyrinth::createLabyrinth(string fileName) {
 				createEmptyBlock(nextPos);
 			}
 			iCol++;
+			nextPos.x += BLOCK_SIZE;
 		}
 		iRow++;
+		nextPos.z += BLOCK_SIZE;
+		nextPos.x = initialPos.x;
 	}
 
 	file.close();
@@ -45,7 +58,7 @@ void Labyrinth::createLabyrinth(string fileName) {
 void Labyrinth::createWallBlock(Vector3 pos) {
 	SceneNode* wall = createChildSceneNode();
 
-	IG2Object* wallObj = new IG2Object(pos + Vector3{0, Labyrinth::BLOCK_SIZE/2., 0}, wall, mSM, "cube.mesh");
+	IG2Object* wallObj = new IG2Object(pos, wall, mSM, "cube.mesh");
 	wallObj->setScale(getCubeScale(wallObj));
 
 	_blocks.push_back(wallObj); 

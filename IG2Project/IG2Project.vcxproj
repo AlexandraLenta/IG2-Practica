@@ -19,17 +19,23 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BreakableBlock.cpp" />
     <ClCompile Include="EmptyBlock.cpp" />
+    <ClCompile Include="FakeBlock.cpp" />
     <ClCompile Include="IG2Object.cpp" />
     <ClCompile Include="IG2Project.cpp" />
+    <ClCompile Include="InvisibleBlock.cpp" />
     <ClCompile Include="Labyrinth.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="WallBlock.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BreakableBlock.h" />
     <ClInclude Include="EmptyBlock.h" />
+    <ClInclude Include="FakeBlock.h" />
     <ClInclude Include="IG2Object.h" />
     <ClInclude Include="IG2Project.h" />
+    <ClInclude Include="InvisibleBlock.h" />
     <ClInclude Include="Labyrinth.h" />
     <ClInclude Include="WallBlock.h" />
   </ItemGroup>

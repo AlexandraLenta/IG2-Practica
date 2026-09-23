@@ -25,6 +25,8 @@ public:
      */
     Labyrinth(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, string fileName);
 
+    ~Labyrinth();
+
 private:
     void createLabyrinth(string fileName);
     void createWallBlock(Vector3 pos);

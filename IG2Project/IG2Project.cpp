@@ -111,5 +111,5 @@ void IG2Project::createFloor() {
 }
 
 void IG2Project::createLabyrinth() {
-    Labyrinth* labyrinth = new Labyrinth({ 0, 0, 0 }, mSM->getRootSceneNode()->createChildSceneNode("labyrinth"), mSM, MAP_NAME);
+    Labyrinth* labyrinth = new Labyrinth({ 0, Labyrinth::BLOCK_SIZE/2., 0 }, mSM->getRootSceneNode()->createChildSceneNode("labyrinth"), mSM, MAP_NAME);
 }
