@@ -58,6 +58,12 @@ public:
     void setInitialPosition(Vector3 v);
 
     /**
+    * Returns the initial position.
+    * @return Initial position of this object.
+    */
+    Vector3 getInitialPosition();
+
+    /**
      * Moves this element.
      * @param v Vector representing the traslation for this element.
      */

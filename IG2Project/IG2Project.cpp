@@ -14,8 +14,25 @@ bool IG2Project::keyPressed(const OgreBites::KeyboardEvent& evt) {
     }
 
     else if (evt.keysym.sym == SDLK_k) {
-        cout << "Position of Sinbad: " << mSinbadNode->getPosition() << endl;
+        //cout << "Position of Sinbad: " << mSinbadNode->getPosition() << endl;
         cout << "Position of the camera: " << mCamNode->getPosition() << endl;
+    }
+
+    else if (evt.keysym.sym == SDLK_UP || evt.keysym.sym == SDLK_w) {
+        cout << "Pressed UP" << endl;
+        _playerDirection = UP;
+    }
+    else if (evt.keysym.sym == SDLK_DOWN || evt.keysym.sym == SDLK_s) {
+        cout << "Pressed DOWN" << endl;
+        _playerDirection = DOWN;
+    }
+    else if (evt.keysym.sym == SDLK_LEFT || evt.keysym.sym == SDLK_a) {
+        cout << "Pressed LEFT" << endl;
+        _playerDirection = LEFT;
+    }
+    else if (evt.keysym.sym == SDLK_RIGHT || evt.keysym.sym == SDLK_d) {
+        cout << "Pressed RIGHT" << endl;
+        _playerDirection = RIGHT;
     }
 
     return true;
@@ -118,4 +135,41 @@ void IG2Project::createLabyrinth() {
 
 void IG2Project::createPlayer() {
     _player = new Player({0, 0, 0}, mSM->getRootSceneNode()->createChildSceneNode("Player"), mSM, "Sinbad.mesh");
+    _player->setInitialPosition({ 0, _player->calculateBoxSize().y / 2.f, 0 });
+    _player->setPosition(_player->getInitialPosition());
+}
+
+Vector3 IG2Project::getNextDirVector() {
+    Vector3 newDirVector = Vector3::ZERO;
+
+    if (_playerDirection == RIGHT)
+        newDirVector = Vector3::UNIT_X;
+    else if (_playerDirection == LEFT)
+        newDirVector = Vector3::NEGATIVE_UNIT_X;
+    else if (_playerDirection == DOWN)
+        newDirVector = Vector3::UNIT_Z;
+    else if (_playerDirection == UP)
+        newDirVector = Vector3::NEGATIVE_UNIT_Z;
+    return newDirVector;
+
+}
+
+bool IG2Project::isDirectionModified() {
+    return _player->getGridOrientation() != getNextDirVector();
+}
+
+Quaternion IG2Project::getQuaternionForNewDirection() {
+    Vector3 newDirVector = getNextDirVector();
+    Quaternion q = _player->getOrientation().getRotationTo(newDirVector);
+    return q;
+}
+
+void IG2Project::frameRendered(const Ogre::FrameEvent& evt) {
+
+    if (_player != nullptr) {
+        if (!isDirectionModified())
+            _player->move(getNextDirVector() * _player->getSpeed() * evt.timeSinceLastFrame);
+        else
+            _player->rotate(getQuaternionForNewDirection());
+    }
 }

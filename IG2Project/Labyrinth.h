@@ -9,7 +9,7 @@ private:
 public:
     static constexpr char WALL_BLOCK = 'x';
     static constexpr char EMPTY_BLOCK = 'o';
-    static constexpr float BLOCK_SIZE = 20; 
+    static constexpr float BLOCK_SIZE = 15; 
 
     /**
      * Constructor without parameters.

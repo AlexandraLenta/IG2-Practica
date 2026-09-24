@@ -36,6 +36,10 @@ void IG2Object::setInitialPosition(Vector3 v) {
     this->initialPosition = v;
 }
 
+Vector3 IG2Object::getInitialPosition() {
+    return this->initialPosition;
+}
+
 void IG2Object::move(Vector3 v) {
     mNode->translate(v);
 }

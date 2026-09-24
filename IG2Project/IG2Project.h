@@ -17,6 +17,8 @@
 #include <OgreWindowEventUtilities.h>
 #include <SDL_keycode.h>
 
+class Player;
+
 static const std::string MAP_NAME = "../../IG2Project/IG2Project/IG2Media/stage1.txt";
 
 class IG2Project: public OgreBites::ApplicationContext, OgreBites::InputListener {
@@ -25,13 +27,21 @@ public:
     explicit IG2Project() : OgreBites::ApplicationContext("IG2Project") {};
     virtual ~IG2Project() {};
 
+    enum PlayerDirections {
+        RIGHT, 
+        LEFT,
+        UP,
+        DOWN
+    };
+
 protected:
     virtual bool keyPressed(const OgreBites::KeyboardEvent& evt);
+    virtual void frameRendered(const Ogre::FrameEvent& evt);
     virtual void setup();
     virtual void shutdown();
     virtual void setupScene();
 
-    IG2Object* _player = nullptr;
+    Player* _player = nullptr;
 
     Ogre::SceneManager* mSM = nullptr;
     OgreBites::TrayManager* mTrayMgr = nullptr;
@@ -43,12 +53,17 @@ protected:
     Ogre::SceneNode* mCamNode = nullptr;
     OgreBites::CameraMan* mCamMgr = nullptr;
 
+    PlayerDirections _playerDirection = DOWN;
+
 private:
     void createCamera();
     void createLights();
     void createFloor();
     void createLabyrinth();
     void createPlayer();
+    Ogre::Vector3 getNextDirVector();
+    bool isDirectionModified();
+    Ogre::Quaternion getQuaternionForNewDirection();
 };
 
 #endif
