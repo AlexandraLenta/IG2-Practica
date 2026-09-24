@@ -31,7 +31,7 @@ protected:
     virtual void shutdown();
     virtual void setupScene();
 
-    Ogre::SceneNode* mSinbadNode = nullptr;
+    IG2Object* _player = nullptr;
 
     Ogre::SceneManager* mSM = nullptr;
     OgreBites::TrayManager* mTrayMgr = nullptr;
@@ -48,6 +48,7 @@ private:
     void createLights();
     void createFloor();
     void createLabyrinth();
+    void createPlayer();
 };
 
 #endif

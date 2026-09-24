@@ -27,6 +27,7 @@
     <ClCompile Include="InvisibleBlock.cpp" />
     <ClCompile Include="Labyrinth.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="WallBlock.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -37,6 +38,7 @@
     <ClInclude Include="IG2Project.h" />
     <ClInclude Include="InvisibleBlock.h" />
     <ClInclude Include="Labyrinth.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="WallBlock.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

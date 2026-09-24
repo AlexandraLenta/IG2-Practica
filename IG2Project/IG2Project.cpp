@@ -1,5 +1,6 @@
 #include "IG2Project.h"
 #include "Labyrinth.h"
+#include "Player.h"
 
 using namespace std;
 using namespace Ogre;
@@ -63,6 +64,7 @@ void IG2Project::setupScene(void) {
     createLights();
     createFloor();
     createLabyrinth();
+    createPlayer();
 }
 
 void IG2Project::createCamera() {
@@ -112,4 +114,8 @@ void IG2Project::createFloor() {
 
 void IG2Project::createLabyrinth() {
     Labyrinth* labyrinth = new Labyrinth({ 0, Labyrinth::BLOCK_SIZE/2., 0 }, mSM->getRootSceneNode()->createChildSceneNode("labyrinth"), mSM, MAP_NAME);
+}
+
+void IG2Project::createPlayer() {
+    _player = new Player({0, 0, 0}, mSM->getRootSceneNode()->createChildSceneNode("Player"), mSM, "Sinbad.mesh");
 }
