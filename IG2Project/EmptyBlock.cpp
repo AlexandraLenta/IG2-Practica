@@ -1,10 +1,10 @@
 #include "EmptyBlock.h"
 
-EmptyBlock::EmptyBlock() : IG2Object() {
+EmptyBlock::EmptyBlock() : Block() {
 }
 
-EmptyBlock::EmptyBlock(Vector3 initPos, SceneNode* node, SceneManager* sceneMng) : IG2Object(initPos, node, sceneMng) {
+EmptyBlock::EmptyBlock(Vector3 initPos, SceneNode* node, SceneManager* sceneMng) : Block(initPos, node, sceneMng) {
 }
 
-EmptyBlock::EmptyBlock(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh) : IG2Object(initPos, node, sceneMng, mesh) {
+EmptyBlock::EmptyBlock(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh) : Block(initPos, node, sceneMng, mesh) {
 }

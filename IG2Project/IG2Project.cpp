@@ -20,19 +20,19 @@ bool IG2Project::keyPressed(const OgreBites::KeyboardEvent& evt) {
 
     else if (evt.keysym.sym == SDLK_UP || evt.keysym.sym == SDLK_w) {
         cout << "Pressed UP" << endl;
-        _playerDirection = UP;
+        _player->setNewDir(Player::UP);
     }
     else if (evt.keysym.sym == SDLK_DOWN || evt.keysym.sym == SDLK_s) {
         cout << "Pressed DOWN" << endl;
-        _playerDirection = DOWN;
+        _player->setNewDir(Player::DOWN);
     }
     else if (evt.keysym.sym == SDLK_LEFT || evt.keysym.sym == SDLK_a) {
         cout << "Pressed LEFT" << endl;
-        _playerDirection = LEFT;
+        _player->setNewDir(Player::LEFT);
     }
     else if (evt.keysym.sym == SDLK_RIGHT || evt.keysym.sym == SDLK_d) {
         cout << "Pressed RIGHT" << endl;
-        _playerDirection = RIGHT;
+        _player->setNewDir(Player::RIGHT);
     }
 
     return true;
@@ -48,6 +48,8 @@ void IG2Project::shutdown() {
 
     delete mTrayMgr;  mTrayMgr = nullptr;
     delete mCamMgr; mCamMgr = nullptr;
+    delete _player; _player = nullptr;
+    delete _labyrinth; _labyrinth = nullptr;
 
     // do not forget to call the base 
     OgreBites::ApplicationContext::shutdown();
@@ -130,7 +132,7 @@ void IG2Project::createFloor() {
 }
 
 void IG2Project::createLabyrinth() {
-    Labyrinth* labyrinth = new Labyrinth({ 0, Labyrinth::BLOCK_SIZE/2., 0 }, mSM->getRootSceneNode()->createChildSceneNode("labyrinth"), mSM, MAP_NAME);
+    _labyrinth = new Labyrinth({ 0, Labyrinth::BLOCK_SIZE/2., 0 }, mSM->getRootSceneNode()->createChildSceneNode("labyrinth"), mSM, MAP_NAME);
 }
 
 void IG2Project::createPlayer() {
@@ -139,37 +141,11 @@ void IG2Project::createPlayer() {
     _player->setPosition(_player->getInitialPosition());
 }
 
-Vector3 IG2Project::getNextDirVector() {
-    Vector3 newDirVector = Vector3::ZERO;
 
-    if (_playerDirection == RIGHT)
-        newDirVector = Vector3::UNIT_X;
-    else if (_playerDirection == LEFT)
-        newDirVector = Vector3::NEGATIVE_UNIT_X;
-    else if (_playerDirection == DOWN)
-        newDirVector = Vector3::UNIT_Z;
-    else if (_playerDirection == UP)
-        newDirVector = Vector3::NEGATIVE_UNIT_Z;
-    return newDirVector;
-
-}
-
-bool IG2Project::isDirectionModified() {
-    return _player->getGridOrientation() != getNextDirVector();
-}
-
-Quaternion IG2Project::getQuaternionForNewDirection() {
-    Vector3 newDirVector = getNextDirVector();
-    Quaternion q = _player->getOrientation().getRotationTo(newDirVector);
-    return q;
-}
 
 void IG2Project::frameRendered(const Ogre::FrameEvent& evt) {
 
-    if (_player != nullptr) {
-        if (!isDirectionModified())
-            _player->move(getNextDirVector() * _player->getSpeed() * evt.timeSinceLastFrame);
-        else
-            _player->rotate(getQuaternionForNewDirection());
+    if (_labyrinth != nullptr) {
+        _labyrinth->moveCharacter(_player, evt.timeSinceLastFrame);
     }
 }

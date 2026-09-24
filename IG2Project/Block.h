@@ -1,13 +1,14 @@
 #pragma once
-#include "Block.h"
-class EmptyBlock :
-    public Block
+#include "IG2Object.h"
+
+class Block : public IG2Object
 {
+public:
 public:
     /**
      * Constructor without parameters.
      */
-    EmptyBlock();
+    Block();
 
     /**
      * Constructor.
@@ -15,7 +16,7 @@ public:
      * @param node Scene node for this element.
      * @param sceneMng Scene manager.
      */
-    EmptyBlock(Vector3 initPos, SceneNode* node, SceneManager* sceneMng);
+    Block(Vector3 initPos, SceneNode* node, SceneManager* sceneMng);
 
     /**
      * Constructor.
@@ -24,6 +25,8 @@ public:
      * @param sceneMng Scene manager.
      * @param mesh Mesh that is applied to this element.
      */
-    EmptyBlock(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh);
+    Block(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh);
+
+	bool canPassThrough();
 };
 

@@ -1,7 +1,7 @@
 #pragma once
-#include "IG2Object.h"
+#include "Block.h"
 class InvisibleBlock :
-    public IG2Object
+    public Block
 {
 };
 

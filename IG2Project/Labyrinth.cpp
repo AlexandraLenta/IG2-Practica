@@ -1,5 +1,7 @@
 #include "Labyrinth.h"
 #include <fstream>
+#include "Player.h"
+#include "Block.h"
 
 Labyrinth::Labyrinth() : IG2Object() {
 }
@@ -79,4 +81,48 @@ Vector3 Labyrinth::getCubeScale(IG2Object* cube) {
 	auto z = Labyrinth::BLOCK_SIZE / (float)cube->calculateBoxSize().z;
 
 	return { x, y, z };
+}
+
+void Labyrinth::moveCharacter(Player* player, Real time) {
+	Block* charBlock, * inFrontBlock;
+
+	// Get the block where the character is placed, and the next one
+	charBlock = this->getBlock(player->getPosition());
+	inFrontBlock = this->getBlock((player->getGridOrientation() * BLOCK_SIZE) + player->getPosition());
+
+	// Character does not change its direction -> step forward!
+	if (!player->isDirectionModified())
+		stepForward(player, time);
+
+	// New direction
+	else {
+		// Check the block in front of the character for the new direction
+		Block* newDirBlock = this->getBlock(player->getPosition() + (player->getNextDirVector() * BLOCK_SIZE));
+		
+		// New position of the character after moving... (for checking if the center of the block is reached)
+		Vector3 charNewPos = player->getPosition() + (player->getGridOrientation() * player->getSpeed() * time);
+		
+		Vector3 difference = Vector3(charNewPos.x - charBlock->getPosition().x, 0, charNewPos.z - charBlock->getPosition().z);
+		// Check if the character can rotate for a new VALID direction
+		if (newDirBlock->canPassThrough() && blockCenterReached(difference, player->getGridOrientation()))
+			player->rotateToNewDirection();
+		// 180 turn?
+		else if (player->is180Turn())
+			player->rotateToNewDirection();
+		// Rotation cannot be performed... check if character can step forward
+		else
+			stepForward(player, time);
+	}
+}
+
+Block* Labyrinth::getBlock(Vector3 position) {
+	return nullptr;
+}
+
+void Labyrinth::stepForward(Player* player, Real time) {
+	player->movePlayer(time);
+}
+
+bool Labyrinth::blockCenterReached(Vector3 difference, Vector3 direction) {
+
 }

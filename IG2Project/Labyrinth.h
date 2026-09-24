@@ -1,5 +1,9 @@
 #pragma once
 #include "IG2Object.h"
+
+class Player;
+class Block;
+
 class Labyrinth :
     public IG2Object
 {
@@ -27,10 +31,16 @@ public:
 
     ~Labyrinth();
 
+    void moveCharacter(Player* player, Real time);
+
 private:
     void createLabyrinth(string fileName);
     void createWallBlock(Vector3 pos);
     void createEmptyBlock(Vector3 pos);
 
     Vector3 getCubeScale(IG2Object* cube);
+
+    Block* getBlock(Vector3 position);
+    void stepForward(Player* player, Real time);
+    bool blockCenterReached(Vector3 difference, Vector3 direction);
 };

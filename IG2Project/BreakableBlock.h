@@ -1,6 +1,7 @@
 #pragma once
-#include "IG2Object.h"
+#include "Block.h"
+
 class BreakableBlock :
-    public IG2Object
+    public Block
 {
 };
