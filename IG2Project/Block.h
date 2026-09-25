@@ -4,7 +4,6 @@
 class Block : public IG2Object
 {
 public:
-public:
     /**
      * Constructor without parameters.
      */
@@ -27,6 +26,9 @@ public:
      */
     Block(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh);
 
-	bool canPassThrough();
+    bool canPassThrough();
+
+protected:
+    bool _canPassThrough;
 };
 

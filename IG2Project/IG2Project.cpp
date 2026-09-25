@@ -40,6 +40,8 @@ bool IG2Project::keyPressed(const OgreBites::KeyboardEvent& evt) {
 
 
 void IG2Project::shutdown() {
+    delete _labyrinth; _labyrinth = nullptr;
+    delete _player; _player = nullptr;
 
     mShaderGenerator->removeSceneManager(mSM);
     mSM->removeRenderQueueListener(mOverlaySystem);
@@ -48,8 +50,6 @@ void IG2Project::shutdown() {
 
     delete mTrayMgr;  mTrayMgr = nullptr;
     delete mCamMgr; mCamMgr = nullptr;
-    delete _player; _player = nullptr;
-    delete _labyrinth; _labyrinth = nullptr;
 
     // do not forget to call the base 
     OgreBites::ApplicationContext::shutdown();
@@ -136,7 +136,7 @@ void IG2Project::createLabyrinth() {
 }
 
 void IG2Project::createPlayer() {
-    _player = new Player({0, 0, 0}, mSM->getRootSceneNode()->createChildSceneNode("Player"), mSM, "Sinbad.mesh");
+    _player = new Player({0, 0, 0}, mSM->getRootSceneNode()->createChildSceneNode("player"), mSM, "Sinbad.mesh");
     _player->setInitialPosition({ 0, _player->calculateBoxSize().y / 2.f, 0 });
     _player->setPosition(_player->getInitialPosition());
 }
@@ -144,8 +144,7 @@ void IG2Project::createPlayer() {
 
 
 void IG2Project::frameRendered(const Ogre::FrameEvent& evt) {
-
     if (_labyrinth != nullptr) {
-        _labyrinth->moveCharacter(_player, evt.timeSinceLastFrame);
+        _labyrinth->movePlayer(_player, evt.timeSinceLastFrame);
     }
 }

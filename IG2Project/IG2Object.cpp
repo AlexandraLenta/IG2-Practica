@@ -1,14 +1,14 @@
 #include "IG2Object.h"
 
-IG2Object::IG2Object() : mNode(nullptr), mSM(nullptr) {
+IG2Object::IG2Object() : mNode(nullptr), mSM(nullptr), entity(nullptr) {
     this->initialPosition = Vector3::ZERO;
 }
 
-IG2Object::IG2Object(Vector3 initPos, SceneNode* node, SceneManager* sceneMng) : initialPosition(initPos), mNode(node), mSM(sceneMng) {
+IG2Object::IG2Object(Vector3 initPos, SceneNode* node, SceneManager* sceneMng) : initialPosition(initPos), mNode(node), mSM(sceneMng), entity(nullptr) {
     this->setPosition(initialPosition);
 }
 
-IG2Object::IG2Object(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh) : initialPosition(initPos), mNode(node), mSM(sceneMng) {
+IG2Object::IG2Object(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh) : initialPosition(initPos), mNode(node), mSM(sceneMng), entity(nullptr) {
 
     // Creates a new entity with the mesh and attach the entity
     entity = sceneMng->createEntity(mesh);

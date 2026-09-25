@@ -1,7 +1,8 @@
 #include "Labyrinth.h"
 #include <fstream>
 #include "Player.h"
-#include "Block.h"
+#include "WallBlock.h"
+#include "EmptyBlock.h"
 
 Labyrinth::Labyrinth() : IG2Object() {
 }
@@ -11,9 +12,9 @@ Labyrinth::Labyrinth(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, s
 }
 
 Labyrinth::~Labyrinth() {
-	for (auto* b : _blocks) {
-		delete b;
-	}
+	for (auto a : _blocks)
+		for (auto* b : a) 
+			delete b;
 
 	_blocks.clear();
 }
@@ -26,26 +27,34 @@ void Labyrinth::createLabyrinth(string fileName) {
 		throw "File not found" + fileName;
 	}
 
-	int numRows, numCols, iRow = 0, iCol = 0;
+
+	int iRow = 0, iCol = 0;
 	char cell;
 
-	file >> numRows >> numCols;
+	file >> _numRows >> _numCols;
 
-	Vector3 absoluteStartingPos = { -(float)(numCols*BLOCK_SIZE)/2.f, 0, -(float)(numRows*BLOCK_SIZE)/2.f };
+	_blocks = std::vector<std::vector<Block*>>(_numRows, std::vector<Block*>(_numCols));
+
+	Vector3 absoluteStartingPos = { -(float)(_numRows*BLOCK_SIZE)/2.f, 0, -(float)(_numCols*BLOCK_SIZE)/2.f };
 	Vector3 initialPos = { getPosition().x + absoluteStartingPos.x, 0, getPosition().z + absoluteStartingPos.z };
 	Vector3 nextPos = initialPos;
 
-	while (iRow < numRows) {
+	while (iRow < _numRows) {
 		iCol = 0;
-		while (iCol < numCols) {
+		while (iCol < _numCols) {
 			file >> cell;
 
+			Block* block = nullptr;
+
 			if (cell == WALL_BLOCK) {
-				createWallBlock(nextPos);
+				block = createBlock(nextPos, WALL);
 			}
 			else if (cell == EMPTY_BLOCK) {
-				createEmptyBlock(nextPos);
+				block = createBlock(nextPos, EMPTY);
 			}
+
+			_blocks[iRow][iCol] = block;
+
 			iCol++;
 			nextPos.x += BLOCK_SIZE;
 		}
@@ -57,25 +66,25 @@ void Labyrinth::createLabyrinth(string fileName) {
 	file.close();
 }
 
-void Labyrinth::createWallBlock(Vector3 pos) {
-	SceneNode* wall = createChildSceneNode();
+Block* Labyrinth::createBlock(Vector3 pos, BlockType type) {
+	SceneNode* block = createChildSceneNode();
+	Block* blockObj = nullptr;
 
-	IG2Object* wallObj = new IG2Object(pos, wall, mSM, "cube.mesh");
-	wallObj->setScale(getCubeScale(wallObj));
+	switch (type) {
+	case WALL:
+		blockObj = new WallBlock(pos, block, mSM, "cube.mesh");
+		break;
+	case EMPTY:
+		blockObj = new EmptyBlock(pos, block, mSM);
+		break;
+	}
 
-	_blocks.push_back(wallObj); 
+	blockObj->setScale(getCubeResizeScale(blockObj));
+
+	return blockObj;
 }
 
-void Labyrinth::createEmptyBlock(Vector3 pos) {
-	SceneNode* empty = createChildSceneNode();
-
-	IG2Object* emptyObj = new IG2Object(pos, empty, mSM);
-	emptyObj->setScale(getCubeScale(emptyObj));
-
-	_blocks.push_back(emptyObj);
-}
-
-Vector3 Labyrinth::getCubeScale(IG2Object* cube) {
+Vector3 Labyrinth::getCubeResizeScale(IG2Object* cube) {
 	auto x = Labyrinth::BLOCK_SIZE / (float)cube->calculateBoxSize().x;
 	auto y = Labyrinth::BLOCK_SIZE / (float)cube->calculateBoxSize().y;
 	auto z = Labyrinth::BLOCK_SIZE / (float)cube->calculateBoxSize().z;
@@ -83,7 +92,7 @@ Vector3 Labyrinth::getCubeScale(IG2Object* cube) {
 	return { x, y, z };
 }
 
-void Labyrinth::moveCharacter(Player* player, Real time) {
+void Labyrinth::movePlayer(Player* player, Real time) {
 	Block* charBlock, * inFrontBlock;
 
 	// Get the block where the character is placed, and the next one
@@ -116,7 +125,19 @@ void Labyrinth::moveCharacter(Player* player, Real time) {
 }
 
 Block* Labyrinth::getBlock(Vector3 position) {
-	return nullptr;
+	Vector3 posInLabyrinth = getPositionRelativeToLabyrinth(position);
+
+	int row, col;
+
+	row = static_cast<int>(posInLabyrinth.z / BLOCK_SIZE);
+	col = static_cast<int>(posInLabyrinth.x / BLOCK_SIZE);
+
+	if (row < 0 || row >= _numRows ||
+		col < 0 || col >= _numCols) {
+		return nullptr;
+	}
+
+	return _blocks[row][col];
 }
 
 void Labyrinth::stepForward(Player* player, Real time) {
@@ -124,5 +145,14 @@ void Labyrinth::stepForward(Player* player, Real time) {
 }
 
 bool Labyrinth::blockCenterReached(Vector3 difference, Vector3 direction) {
+	return true;
+}
 
+Vector3 Labyrinth::getPositionRelativeToLabyrinth(Vector3 pos) {
+	Vector3 relative = pos - getPosition();
+
+	relative.x += _numCols * BLOCK_SIZE / 2.f;
+	relative.z += _numRows * BLOCK_SIZE / 2.f;
+
+	return relative;
 }

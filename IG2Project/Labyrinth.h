@@ -8,12 +8,17 @@ class Labyrinth :
     public IG2Object
 {
 private:
-    std::vector<IG2Object*> _blocks;
+    std::vector<std::vector<Block*>> _blocks;
 
 public:
     static constexpr char WALL_BLOCK = 'x';
     static constexpr char EMPTY_BLOCK = 'o';
     static constexpr float BLOCK_SIZE = 15; 
+
+    enum BlockType {
+        EMPTY,
+        WALL
+    };
 
     /**
      * Constructor without parameters.
@@ -31,16 +36,19 @@ public:
 
     ~Labyrinth();
 
-    void moveCharacter(Player* player, Real time);
+    void movePlayer(Player* player, Real time);
 
 private:
-    void createLabyrinth(string fileName);
-    void createWallBlock(Vector3 pos);
-    void createEmptyBlock(Vector3 pos);
+    int _numRows, _numCols;
 
-    Vector3 getCubeScale(IG2Object* cube);
+    void createLabyrinth(string fileName);
+    Block* createBlock(Vector3 pos, BlockType type);
+
+    Vector3 getCubeResizeScale(IG2Object* cube);
 
     Block* getBlock(Vector3 position);
     void stepForward(Player* player, Real time);
     bool blockCenterReached(Vector3 difference, Vector3 direction);
+
+    Vector3 getPositionRelativeToLabyrinth(Vector3 pos);
 };

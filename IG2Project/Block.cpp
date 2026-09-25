@@ -7,3 +7,7 @@ Block::Block(Vector3 initPos, SceneNode* node, SceneManager* sceneMng) : IG2Obje
 
 Block::Block(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh) : IG2Object(initPos, node, sceneMng, mesh) {
 }
+
+bool Block::canPassThrough() {
+	return _canPassThrough;
+}
