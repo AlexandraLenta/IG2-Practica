@@ -1,8 +1,12 @@
 #pragma once
 #include "IG2Object.h"
 
+#include <vector>
+#include <istream>
+
 class Player;
 class Block;
+class IG2Project;
 
 class Labyrinth :
     public IG2Object
@@ -13,6 +17,7 @@ private:
 public:
     static constexpr char WALL_BLOCK = 'x';
     static constexpr char EMPTY_BLOCK = 'o';
+    static constexpr char HERO = 'h';
     static constexpr float BLOCK_SIZE = 15; 
 
     enum BlockType {
@@ -32,7 +37,7 @@ public:
      * @param sceneMng Scene manager.
      * @param fileName File with labyrinth configuration
      */
-    Labyrinth(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, string fileName);
+    Labyrinth(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, std::istream& input, IG2Project* ig2);
 
     ~Labyrinth();
 
@@ -41,7 +46,7 @@ public:
 private:
     int _numRows, _numCols;
 
-    void createLabyrinth(string fileName);
+    void createLabyrinth(std::istream& input, IG2Project* ig2);
     Block* createBlock(Vector3 pos, BlockType type);
 
     Vector3 getCubeResizeScale(IG2Object* cube);

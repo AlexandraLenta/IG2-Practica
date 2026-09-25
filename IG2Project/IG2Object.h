@@ -12,7 +12,6 @@
 
 
 using namespace Ogre;
-using namespace std;
 
 class IG2Object : public OgreBites::InputListener {
 
@@ -140,7 +139,7 @@ public:
      * Sets the name of the material to be applied to this element.
      * @param materialName Name of the material.
      */
-    void setMaterialName(string materialName);
+    void setMaterialName(std::string materialName);
 
     /**
      * Calculates if this element has an attached entity.

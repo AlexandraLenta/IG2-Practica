@@ -1,8 +1,8 @@
 #include "IG2Project.h"
 #include "Labyrinth.h"
 #include "Player.h"
+#include <fstream>
 
-using namespace std;
 using namespace Ogre;
 
 
@@ -15,23 +15,23 @@ bool IG2Project::keyPressed(const OgreBites::KeyboardEvent& evt) {
 
     else if (evt.keysym.sym == SDLK_k) {
         //cout << "Position of Sinbad: " << mSinbadNode->getPosition() << endl;
-        cout << "Position of the camera: " << mCamNode->getPosition() << endl;
+        std::cout << "Position of the camera: " << mCamNode->getPosition() << std::endl;
     }
 
     else if (evt.keysym.sym == SDLK_UP || evt.keysym.sym == SDLK_w) {
-        cout << "Pressed UP" << endl;
+        std::cout << "Pressed UP" << std::endl;
         _player->setNewDir(Player::UP);
     }
     else if (evt.keysym.sym == SDLK_DOWN || evt.keysym.sym == SDLK_s) {
-        cout << "Pressed DOWN" << endl;
+        std::cout << "Pressed DOWN" << std::endl;
         _player->setNewDir(Player::DOWN);
     }
     else if (evt.keysym.sym == SDLK_LEFT || evt.keysym.sym == SDLK_a) {
-        cout << "Pressed LEFT" << endl;
+        std::cout << "Pressed LEFT" << std::endl;
         _player->setNewDir(Player::LEFT);
     }
     else if (evt.keysym.sym == SDLK_RIGHT || evt.keysym.sym == SDLK_d) {
-        cout << "Pressed RIGHT" << endl;
+        std::cout << "Pressed RIGHT" << std::endl;
         _player->setNewDir(Player::RIGHT);
     }
 
@@ -82,8 +82,7 @@ void IG2Project::setupScene(void) {
     createCamera();
     createLights();
     createFloor();
-    createLabyrinth();
-    createPlayer();
+    createMap();
 }
 
 void IG2Project::createCamera() {
@@ -131,13 +130,22 @@ void IG2Project::createFloor() {
     floorNode->attachObject(entFloor);
 }
 
-void IG2Project::createLabyrinth() {
-    _labyrinth = new Labyrinth({ 0, Labyrinth::BLOCK_SIZE/2., 0 }, mSM->getRootSceneNode()->createChildSceneNode("labyrinth"), mSM, MAP_NAME);
+void IG2Project::createMap() {
+    std::ifstream file;
+    file.open(MAP_NAME);
+
+    if (!file) {
+        throw "File not found" + MAP_NAME;
+    }
+
+    _labyrinth = new Labyrinth({ 0, Labyrinth::BLOCK_SIZE/2., 0 }, mSM->getRootSceneNode()->createChildSceneNode("labyrinth"), mSM, file, this);
+
+    file.close();
 }
 
-void IG2Project::createPlayer() {
-    _player = new Player({0, 0, 0}, mSM->getRootSceneNode()->createChildSceneNode("player"), mSM, "Sinbad.mesh");
-    _player->setInitialPosition({ 0, _player->calculateBoxSize().y / 2.f, 0 });
+void IG2Project::createPlayer(Vector3 position) {
+    _player = new Player(position, mSM->getRootSceneNode()->createChildSceneNode("player"), mSM, "Sinbad.mesh");
+    _player->setInitialPosition({ _player->getPosition().x, _player->getPosition().y + _player->calculateBoxSize().y / 2.f, _player->getPosition().z });
     _player->setPosition(_player->getInitialPosition());
 }
 

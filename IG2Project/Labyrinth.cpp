@@ -1,14 +1,14 @@
 #include "Labyrinth.h"
-#include <fstream>
 #include "Player.h"
 #include "WallBlock.h"
 #include "EmptyBlock.h"
+#include "IG2Project.h"
 
 Labyrinth::Labyrinth() : IG2Object() {
 }
 
-Labyrinth::Labyrinth(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, string fileName) : IG2Object(initPos, node, sceneMng) {	
-	createLabyrinth(fileName);
+Labyrinth::Labyrinth(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, std::istream& input, IG2Project* ig2) : IG2Object(initPos, node, sceneMng) {	
+	createLabyrinth(input, ig2);
 }
 
 Labyrinth::~Labyrinth() {
@@ -19,19 +19,11 @@ Labyrinth::~Labyrinth() {
 	_blocks.clear();
 }
 
-void Labyrinth::createLabyrinth(string fileName) {
-	ifstream file;
-	file.open(fileName);
-
-	if (!file) {
-		throw "File not found" + fileName;
-	}
-
-
+void Labyrinth::createLabyrinth(std::istream& input, IG2Project* ig2) {
 	int iRow = 0, iCol = 0;
 	char cell;
 
-	file >> _numRows >> _numCols;
+	input >> _numRows >> _numCols;
 
 	_blocks = std::vector<std::vector<Block*>>(_numRows, std::vector<Block*>(_numCols));
 
@@ -42,7 +34,7 @@ void Labyrinth::createLabyrinth(string fileName) {
 	while (iRow < _numRows) {
 		iCol = 0;
 		while (iCol < _numCols) {
-			file >> cell;
+			input >> cell;
 
 			Block* block = nullptr;
 
@@ -51,6 +43,14 @@ void Labyrinth::createLabyrinth(string fileName) {
 			}
 			else if (cell == EMPTY_BLOCK) {
 				block = createBlock(nextPos, EMPTY);
+			}
+			else if (cell == HERO) {
+				block = createBlock(nextPos, EMPTY); // donde esta el jugador no puede haber ningun bloque
+
+				Vector3 playerPos = { iCol * BLOCK_SIZE, 0, iRow * BLOCK_SIZE };
+				playerPos += getPosition();
+
+				ig2->createPlayer(playerPos);
 			}
 
 			_blocks[iRow][iCol] = block;
@@ -62,8 +62,6 @@ void Labyrinth::createLabyrinth(string fileName) {
 		nextPos.z += BLOCK_SIZE;
 		nextPos.x = initialPos.x;
 	}
-
-	file.close();
 }
 
 Block* Labyrinth::createBlock(Vector3 pos, BlockType type) {

@@ -86,7 +86,7 @@ Vector3 IG2Object::getGridOrientation() {
     return getOrientation().primaryAxis();
 }
 
-void IG2Object::setMaterialName(string materialName) {
+void IG2Object::setMaterialName(std::string materialName) {
     entity->setMaterialName(materialName);
 }
 

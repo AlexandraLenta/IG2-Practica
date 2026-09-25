@@ -13,7 +13,6 @@
 #include <sstream>
 #include <iostream>
 #include <string>
-#include "Ogre.h"
 #include <OgreWindowEventUtilities.h>
 #include <SDL_keycode.h>
 
@@ -27,6 +26,8 @@ class IG2Project: public OgreBites::ApplicationContext, OgreBites::InputListener
 public:
     explicit IG2Project() : OgreBites::ApplicationContext("IG2Project") {};
     virtual ~IG2Project() {};
+
+    void createPlayer(Ogre::Vector3 position);
 
 protected:
     virtual bool keyPressed(const OgreBites::KeyboardEvent& evt);
@@ -52,8 +53,7 @@ private:
     void createCamera();
     void createLights();
     void createFloor();
-    void createLabyrinth();
-    void createPlayer();
+    void createMap();
 };
 
 #endif
