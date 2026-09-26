@@ -44,16 +44,45 @@ public:
     void movePlayer(Player* player, Real time);
 
 private:
-    int _numRows, _numCols;
+    int _numRows, _numCols; 
+    Vector3 _labyrinthOrigin;
 
+    /// <summary>
+    /// Creates the labyrinth structure.
+    /// </summary>
+    /// <param name="input">The input stream to read the structure from.</param>
+    /// <param name="ig2">Pointer to the project. Used to create player within scene.</param>
     void createLabyrinth(std::istream& input, IG2Project* ig2);
+
+    /// <summary>
+    /// Creates a block of a given size.
+    /// </summary>
+    /// <param name="pos">Position of block.</param>
+    /// <param name="type">The type of the block.</param>
+    /// <returns>Pointer to the block object.</returns>
     Block* createBlock(Vector3 pos, BlockType type);
 
     Vector3 getCubeResizeScale(IG2Object* cube);
 
+    /// <summary>
+    /// Get the block corresponding to given position.
+    /// </summary>
+    /// <param name="position">The position to check.</param>
+    /// <returns>Pointer to the block object in given position.</returns>
     Block* getBlock(Vector3 position);
-    void stepForward(Player* player, Real time);
+
+    /// <summary>
+    /// Check if the player has reached the center of the block.
+    /// </summary>
+    /// <param name="difference">The difference between the center of the block and the player's position.</param>
+    /// <param name="direction">The direction in which the player is heading.</param>
+    /// <returns></returns>
     bool blockCenterReached(Vector3 difference, Vector3 direction);
 
+    /// <summary>
+    /// Calculates the player's position within the labyrinth, with the center in the top left corner of the labyrinth.
+    /// </summary>
+    /// <param name="pos">Position to translate to labyrinth coordinates.</param>
+    /// <returns>The position within the labyrinth, relative to its top left corner.</returns>
     Vector3 getPositionRelativeToLabyrinth(Vector3 pos);
 };
