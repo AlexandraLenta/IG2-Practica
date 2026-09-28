@@ -153,6 +153,7 @@ void IG2Project::createPlayer(Vector3 position) {
 
 void IG2Project::frameRendered(const Ogre::FrameEvent& evt) {
     if (_labyrinth != nullptr) {
+        _labyrinth->updateLabyrinth(evt.timeSinceLastFrame);
         _labyrinth->movePlayer(_player, evt.timeSinceLastFrame);
     }
 }

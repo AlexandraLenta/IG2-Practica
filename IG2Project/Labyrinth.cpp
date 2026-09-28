@@ -3,6 +3,9 @@
 #include "WallBlock.h"
 #include "EmptyBlock.h"
 #include "IG2Project.h"
+#include "InvisibleBlock.h"
+#include "BreakableBlock.h"
+#include "FakeBlock.h"
 
 Labyrinth::Labyrinth() : IG2Object() {
 }
@@ -71,10 +74,19 @@ Block* Labyrinth::createBlock(Vector3 pos, BlockType type) {
 
 	switch (type) {
 	case WALL:
-		blockObj = new WallBlock(pos, block, mSM, "cube.mesh");
+		blockObj = new WallBlock(pos, block, mSM);
 		break;
 	case EMPTY:
 		blockObj = new EmptyBlock(pos, block, mSM);
+		break;
+	case INVISIBLE:
+		blockObj = new InvisibleBlock(pos, block, mSM);
+		break;
+	case FAKE:
+		blockObj = new FakeBlock(pos, block, mSM);
+		break;
+	case BREAKABLE:
+		blockObj = new BreakableBlock(pos, block, mSM);
 		break;
 	}
 
@@ -171,4 +183,12 @@ bool Labyrinth::blockCenterReached(Vector3 difference, Vector3 direction) {
 		return difference.z <= tolerance;
 
 	return false;
+}
+
+void Labyrinth::updateLabyrinth(Real time) {
+	for (auto rows : _blocks) {
+		for (auto* block : rows) {
+			block->update(time);
+		}
+	}
 }

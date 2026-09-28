@@ -17,12 +17,19 @@ private:
 public:
     static constexpr char WALL_BLOCK = 'x';
     static constexpr char EMPTY_BLOCK = 'o';
+    static constexpr char INVISIBLE_BLOCK = 'i';
+    static constexpr char FAKE_BLOCK = 'f';
+    static constexpr char BREAKABLE_BLOCK = 'b';
+    static constexpr char EMPTY_BLOCK = 'o';
     static constexpr char HERO = 'h';
     static constexpr float BLOCK_SIZE = 15; 
 
     enum BlockType {
         EMPTY,
-        WALL
+        WALL,
+        INVISIBLE,
+        FAKE,
+        BREAKABLE
     };
 
     /**
@@ -41,11 +48,13 @@ public:
 
     ~Labyrinth();
 
+    void updateLabyrinth(Real time);
     void movePlayer(Player* player, Real time);
 
 private:
     int _numRows, _numCols; 
     Vector3 _labyrinthOrigin;
+
 
     /// <summary>
     /// Creates the labyrinth structure.

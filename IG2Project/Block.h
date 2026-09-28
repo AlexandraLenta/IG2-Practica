@@ -4,6 +4,7 @@
 class Block : public IG2Object
 {
 public:
+    static constexpr char MESH_NAME[] = "cube.mesh";
     /**
      * Constructor without parameters.
      */
@@ -27,6 +28,8 @@ public:
     Block(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh);
 
     bool canPassThrough();
+
+    virtual void update(Real time);
 
 protected:
     bool _canPassThrough;
