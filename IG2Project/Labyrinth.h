@@ -78,11 +78,4 @@ private:
     /// <param name="direction">The direction in which the player is heading.</param>
     /// <returns></returns>
     bool blockCenterReached(Vector3 difference, Vector3 direction);
-
-    /// <summary>
-    /// Calculates the player's position within the labyrinth, with the center in the top left corner of the labyrinth.
-    /// </summary>
-    /// <param name="pos">Position to translate to labyrinth coordinates.</param>
-    /// <returns>The position within the labyrinth, relative to its top left corner.</returns>
-    Vector3 getPositionRelativeToLabyrinth(Vector3 pos);
 };

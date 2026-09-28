@@ -50,5 +50,5 @@ bool Player::is180Turn() {
 }
 
 void Player::movePlayer(Real time) {
-    move(getNextDirVector() * getSpeed() * time);
+    move(getGridOrientation() * getSpeed() * time);
 }

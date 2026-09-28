@@ -102,20 +102,17 @@ void Labyrinth::movePlayer(Player* player, Real time) {
 
 	Block* inFrontBlock = getBlock(player->getPosition() + currentDir * BLOCK_SIZE);
 
+	Vector3 newPos = currentDir * player->getSpeed() * time + player->getPosition();
+
+	Vector3 difference = newPos - currentBlock->getPosition();
+
 	// Player trying to change position
 	if (player->isDirectionModified()) {
 		Block* nextBlock = getBlock(player->getPosition() + player->getNextDirVector() * BLOCK_SIZE);
 
-		Vector3 movement = currentDir * player->getSpeed() * time;
-
-		Vector3 newPos = movement + player->getPosition();
-
-		Vector3 difference = newPos - currentBlock->getPosition();
-
 		// if we've reached the center, see if new direction is valid
 		if (blockCenterReached(difference, currentDir)) {
 			if (nextBlock != nullptr && nextBlock->canPassThrough()) {
-				player->setPosition(currentBlock->getPosition());
 				player->rotateToNewDirection();
 				return;
 			}
@@ -126,25 +123,26 @@ void Labyrinth::movePlayer(Player* player, Real time) {
 				return;
 			}
 		}
-		//player->movePlayer(time);
 	}
 
-	else if (inFrontBlock != nullptr && inFrontBlock->canPassThrough()) {
+	if (inFrontBlock != nullptr && inFrontBlock->canPassThrough()) {
 		player->movePlayer(time);
+	}
+	else if (inFrontBlock != nullptr) {
+		if (!blockCenterReached(difference, currentDir))
+			player->movePlayer(time);
 	}
 }
 
 Block* Labyrinth::getBlock(Vector3 position) {
-	Vector3 posInLabyrinth = getPositionRelativeToLabyrinth(position);
-
-	//std::cout << posInLabyrinth << '\n';
+	Vector3 relative = position - _labyrinthOrigin;
 
 	int col = static_cast<int>(
-		std::round(posInLabyrinth.x / BLOCK_SIZE)
+		std::round(relative.x / BLOCK_SIZE)
 		);
 
 	int row = static_cast<int>(
-		std::round(posInLabyrinth.z / BLOCK_SIZE)
+		std::round(relative.z / BLOCK_SIZE)
 		);
 
 	if (row < 0 || row >= _numRows ||
@@ -173,13 +171,4 @@ bool Labyrinth::blockCenterReached(Vector3 difference, Vector3 direction) {
 		return difference.z <= tolerance;
 
 	return false;
-}
-
-Vector3 Labyrinth::getPositionRelativeToLabyrinth(Vector3 pos) {
-	Vector3 relative = pos - _labyrinthOrigin;
-
-	relative.x += _numCols * BLOCK_SIZE / 2.f;
-	relative.z += _numRows * BLOCK_SIZE / 2.f;
-
-	return relative;
 }
