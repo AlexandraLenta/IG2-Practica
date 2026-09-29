@@ -47,8 +47,17 @@ void Labyrinth::createLabyrinth(std::istream& input, IG2Project* ig2) {
 			else if (cell == EMPTY_BLOCK) {
 				block = createBlock(nextPos, EMPTY);
 			}
+			else if (cell == INVISIBLE_BLOCK) {
+				block = createBlock(nextPos, INVISIBLE);
+			}
+			else if (cell == FAKE_BLOCK) {
+				block = createBlock(nextPos, FAKE);
+			}
+			else if (cell == BREAKABLE_BLOCK) {
+				block = createBlock(nextPos, BREAKABLE);
+			}
 			else if (cell == HERO) {
-				block = createBlock(nextPos, EMPTY); // donde esta el jugador no puede haber ningun bloque
+				block = createBlock(nextPos, EMPTY); // donde esta el jugador solo puede haber un bloque vacio
 
 				Vector3 playerPos = _labyrinthOrigin;
 				playerPos.x += iCol * BLOCK_SIZE;

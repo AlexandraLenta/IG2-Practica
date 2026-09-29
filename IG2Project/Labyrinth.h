@@ -20,7 +20,6 @@ public:
     static constexpr char INVISIBLE_BLOCK = 'i';
     static constexpr char FAKE_BLOCK = 'f';
     static constexpr char BREAKABLE_BLOCK = 'b';
-    static constexpr char EMPTY_BLOCK = 'o';
     static constexpr char HERO = 'h';
     static constexpr float BLOCK_SIZE = 15; 
 

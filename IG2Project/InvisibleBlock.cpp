@@ -21,7 +21,7 @@ void InvisibleBlock::init() {
 void InvisibleBlock::update(Real time) {
 	if (_timer.getMilliseconds() >= INVISIBLE_TIMER * 1000) {
 		_timer.reset();
-		_isVisible != _isVisible;
+		_isVisible = !_isVisible;
 		setVisible(_isVisible);
 	}
 }

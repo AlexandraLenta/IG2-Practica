@@ -19,7 +19,7 @@
 class Player;
 class Labyrinth;
 
-static const std::string MAP_NAME = "../../IG2Project/IG2Project/IG2Media/stage1.txt";
+static const std::string MAP_NAME = "../../IG2Project/IG2Project/IG2Media/stage1b.txt";
 
 class IG2Project: public OgreBites::ApplicationContext, OgreBites::InputListener {
 
