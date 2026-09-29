@@ -1,5 +1,7 @@
 #pragma once
 #include "Block.h"
+#include "OgreTimer.h"
+
 class InvisibleBlock :
     public Block
 {
@@ -31,6 +33,8 @@ public:
 
 private:
     bool _isVisible = false;
-    float _timer = 0.0f;
+    Ogre::Timer _timer;
+
+    void init();
 };
 

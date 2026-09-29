@@ -11,3 +11,8 @@ BreakableBlock::BreakableBlock(Vector3 initPos, SceneNode* node, SceneManager* s
 BreakableBlock::BreakableBlock(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh) : Block(initPos, node, sceneMng, mesh) {
 	_canPassThrough = false;
 }
+
+void BreakableBlock::breakBlock() {
+	setVisible(false);
+	_canPassThrough = true;
+}

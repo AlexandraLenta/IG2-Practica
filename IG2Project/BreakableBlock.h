@@ -26,4 +26,6 @@ public:
      * @param mesh Mesh that is applied to this element.
      */
     BreakableBlock(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh);
+
+    void breakBlock();
 };

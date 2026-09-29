@@ -1,24 +1,26 @@
 #include "InvisibleBlock.h"
 
 InvisibleBlock::InvisibleBlock() : Block() {
-	_canPassThrough = false;
-	setVisible(_isVisible);
+	init();
 }
 
-InvisibleBlock::InvisibleBlock(Vector3 initPos, SceneNode* node, SceneManager* sceneMng) : Block(initPos, node, sceneMng) {
-	_canPassThrough = false;
-	setVisible(_isVisible);
+InvisibleBlock::InvisibleBlock(Vector3 initPos, SceneNode* node, SceneManager* sceneMng) : Block(initPos, node, sceneMng, MESH_NAME) {
+	init();
 }
 
 InvisibleBlock::InvisibleBlock(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh) : Block(initPos, node, sceneMng, mesh) {
+	init();
+}
+
+void InvisibleBlock::init() {
 	_canPassThrough = false;
 	setVisible(_isVisible);
+	_timer = Ogre::Timer::Timer();
 }
 
 void InvisibleBlock::update(Real time) {
-	_timer += time;
-	if (_timer >= INVISIBLE_TIMER) {
-		_timer = 0.0f;
+	if (_timer.getMilliseconds() >= INVISIBLE_TIMER * 1000) {
+		_timer.reset();
 		_isVisible != _isVisible;
 		setVisible(_isVisible);
 	}
