@@ -1,5 +1,5 @@
 #include "Labyrinth.h"
-#include "Player.h"
+#include "Character.h"
 #include "WallBlock.h"
 #include "EmptyBlock.h"
 #include "IG2Project.h"
@@ -63,7 +63,16 @@ void Labyrinth::createLabyrinth(std::istream& input, IG2Project* ig2) {
 				playerPos.x += iCol * BLOCK_SIZE;
 				playerPos.z += iRow * BLOCK_SIZE;
 
-				ig2->createPlayer(playerPos);
+				_characters.push_back(ig2->createPlayer(playerPos));
+			}
+			else if (cell == VILLAIN) {
+				block = createBlock(nextPos, EMPTY); // donde esta el jugador solo puede haber un bloque vacio
+
+				Vector3 villainPos = _labyrinthOrigin;
+				villainPos.x += iCol * BLOCK_SIZE;
+				villainPos.z += iRow * BLOCK_SIZE;
+
+				ig2->createPlayer(villainPos);
 			}
 
 			_blocks[iRow][iCol] = block;
@@ -112,46 +121,46 @@ Vector3 Labyrinth::getCubeResizeScale(IG2Object* cube) {
 	return { x, y, z };
 }
 
-void Labyrinth::movePlayer(Player* player, Real time) {
+void Labyrinth::moveCharacter(Character* character, Real time) {
 	// Get the block where the character is placed, and the next one
-	Block* currentBlock = getBlock(player->getPosition());
+	Block* currentBlock = getBlock(character->getPosition());
 
 	if (currentBlock == nullptr)
 		return;
 
-	Vector3 currentDir = player->getGridOrientation();
+	Vector3 currentDir = character->getGridOrientation();
 
-	Block* inFrontBlock = getBlock(player->getPosition() + currentDir * BLOCK_SIZE);
+	Block* inFrontBlock = getBlock(character->getPosition() + currentDir * BLOCK_SIZE);
 
-	Vector3 newPos = currentDir * player->getSpeed() * time + player->getPosition();
+	Vector3 newPos = currentDir * character->getSpeed() * time + character->getPosition();
 
 	Vector3 difference = newPos - currentBlock->getPosition();
 
 	// Player trying to change position
-	if (player->isDirectionModified()) {
-		Block* nextBlock = getBlock(player->getPosition() + player->getNextDirVector() * BLOCK_SIZE);
+	if (character->isDirectionModified()) {
+		Block* nextBlock = getBlock(character->getPosition() + character->getNextDirVector() * BLOCK_SIZE);
 
 		// if we've reached the center, see if new direction is valid
 		if (blockCenterReached(difference, currentDir)) {
 			if (nextBlock != nullptr && nextBlock->canPassThrough()) {
-				player->rotateToNewDirection();
+				character->rotateToNewDirection();
 				return;
 			}
 
-			if (player->is180Turn()) {
+			if (character->is180Turn()) {
 				std::cout << "180 turn\n";
-				player->rotateToNewDirection();
+				character->rotateToNewDirection();
 				return;
 			}
 		}
 	}
 
 	if (inFrontBlock != nullptr && inFrontBlock->canPassThrough()) {
-		player->movePlayer(time);
+		character->moveCharacter(time);
 	}
 	else if (inFrontBlock != nullptr) {
 		if (!blockCenterReached(difference, currentDir))
-			player->movePlayer(time);
+			character->moveCharacter(time);
 	}
 }
 
@@ -199,5 +208,10 @@ void Labyrinth::updateLabyrinth(Real time) {
 		for (auto* block : rows) {
 			block->update(time);
 		}
+	}
+
+	for (auto* ch : _characters) {
+		ch->update(time);
+		moveCharacter(ch, time);
 	}
 }

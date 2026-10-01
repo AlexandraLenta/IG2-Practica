@@ -143,17 +143,16 @@ void IG2Project::createMap() {
     file.close();
 }
 
-void IG2Project::createPlayer(Vector3 position) {
+Character* IG2Project::createPlayer(Vector3 position) {
     _player = new Player(position, mSM->getRootSceneNode()->createChildSceneNode("player"), mSM, "Sinbad.mesh");
     _player->setInitialPosition({ _player->getPosition().x, _player->getPosition().y + _player->calculateBoxSize().y / 2.f, _player->getPosition().z });
     _player->setPosition(_player->getInitialPosition());
+
+    return _player;
 }
-
-
 
 void IG2Project::frameRendered(const Ogre::FrameEvent& evt) {
     if (_labyrinth != nullptr) {
         _labyrinth->updateLabyrinth(evt.timeSinceLastFrame);
-        _labyrinth->movePlayer(_player, evt.timeSinceLastFrame);
     }
 }

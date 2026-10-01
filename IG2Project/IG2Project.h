@@ -18,6 +18,7 @@
 
 class Player;
 class Labyrinth;
+class Character;
 
 static const std::string MAP_NAME = "../../IG2Project/IG2Project/IG2Media/stage1b.txt";
 
@@ -27,7 +28,7 @@ public:
     explicit IG2Project() : OgreBites::ApplicationContext("IG2Project") {};
     virtual ~IG2Project() {};
 
-    void createPlayer(Ogre::Vector3 position);
+    Character* createPlayer(Ogre::Vector3 position);
 
 protected:
     virtual bool keyPressed(const OgreBites::KeyboardEvent& evt);

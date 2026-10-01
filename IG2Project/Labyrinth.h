@@ -4,16 +4,13 @@
 #include <vector>
 #include <istream>
 
-class Player;
+class Character;
 class Block;
 class IG2Project;
 
 class Labyrinth :
     public IG2Object
 {
-private:
-    std::vector<std::vector<Block*>> _blocks;
-
 public:
     static constexpr char WALL_BLOCK = 'x';
     static constexpr char EMPTY_BLOCK = 'o';
@@ -21,6 +18,7 @@ public:
     static constexpr char FAKE_BLOCK = 'f';
     static constexpr char BREAKABLE_BLOCK = 'b';
     static constexpr char HERO = 'h';
+    static constexpr char VILLAIN = 'v';
     static constexpr float BLOCK_SIZE = 15; 
 
     enum BlockType {
@@ -48,12 +46,13 @@ public:
     ~Labyrinth();
 
     void updateLabyrinth(Real time);
-    void movePlayer(Player* player, Real time);
+    void moveCharacter(Character* character, Real time);
 
 private:
     int _numRows, _numCols; 
     Vector3 _labyrinthOrigin;
-
+    std::vector<std::vector<Block*>> _blocks;
+    std::vector<Character*> _characters;
 
     /// <summary>
     /// Creates the labyrinth structure.
