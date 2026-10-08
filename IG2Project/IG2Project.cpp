@@ -1,10 +1,10 @@
 #include "IG2Project.h"
 #include "Labyrinth.h"
 #include "Player.h"
+#include "SpecialVillain.h"
 #include <fstream>
 
 using namespace Ogre;
-
 
 bool IG2Project::keyPressed(const OgreBites::KeyboardEvent& evt) {
 
@@ -83,6 +83,10 @@ void IG2Project::setupScene(void) {
     createLights();
     createFloor();
     createMap();
+
+    SpecialVillain* villain = new SpecialVillain(Vector3{200, 0, 0}, mSM->getRootSceneNode()->createChildSceneNode("villain"), mSM);
+    villain->setInitialPosition({ villain->getPosition().x, villain->getPosition().y + villain->calculateBoxSize().y / 2.f, villain->getPosition().z });
+    villain->setPosition(villain->getInitialPosition());
 }
 
 void IG2Project::createCamera() {
@@ -144,7 +148,7 @@ void IG2Project::createMap() {
 }
 
 Character* IG2Project::createPlayer(Vector3 position) {
-    _player = new Player(position, mSM->getRootSceneNode()->createChildSceneNode("player"), mSM, "Sinbad.mesh");
+    _player = new Player(position, mSM->getRootSceneNode()->createChildSceneNode("player"), mSM, "Barrel.mesh");
     _player->setInitialPosition({ _player->getPosition().x, _player->getPosition().y + _player->calculateBoxSize().y / 2.f, _player->getPosition().z });
     _player->setPosition(_player->getInitialPosition());
 

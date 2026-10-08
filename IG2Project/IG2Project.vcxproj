@@ -30,6 +30,8 @@
     <ClCompile Include="Labyrinth.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="SimpleVillain.cpp" />
+    <ClCompile Include="SpecialVillain.cpp" />
     <ClCompile Include="Villain.cpp" />
     <ClCompile Include="WallBlock.cpp" />
   </ItemGroup>
@@ -44,6 +46,8 @@
     <ClInclude Include="InvisibleBlock.h" />
     <ClInclude Include="Labyrinth.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="SimpleVillain.h" />
+    <ClInclude Include="SpecialVillain.h" />
     <ClInclude Include="Villain.h" />
     <ClInclude Include="WallBlock.h" />
   </ItemGroup>

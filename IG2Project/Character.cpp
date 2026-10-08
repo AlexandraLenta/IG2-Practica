@@ -4,6 +4,10 @@ Character::Character(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, S
 
 }
 
+Character::Character(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, float sp, int l) : IG2Object(initPos, node, sceneMng), _speed(sp), _life(l) {
+
+}
+
 float Character::getSpeed() {
     return _speed;
 }

@@ -18,7 +18,8 @@ public:
     static constexpr char FAKE_BLOCK = 'f';
     static constexpr char BREAKABLE_BLOCK = 'b';
     static constexpr char HERO = 'h';
-    static constexpr char VILLAIN = 'v';
+    static constexpr char VILLAIN_NORMAL = 'v';
+    static constexpr char VILLAIN_SPECIAL = 'V';
     static constexpr float BLOCK_SIZE = 15; 
 
     enum BlockType {

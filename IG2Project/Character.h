@@ -12,6 +12,7 @@ public:
         DOWN
     };
 
+    Character(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, float sp = 10, int l = 3);
     Character(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh, float sp = 10, int l = 3);
 
     float getSpeed();

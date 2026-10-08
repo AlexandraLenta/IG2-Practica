@@ -1,11 +1,12 @@
 #include "Labyrinth.h"
-#include "Character.h"
 #include "WallBlock.h"
 #include "EmptyBlock.h"
 #include "IG2Project.h"
 #include "InvisibleBlock.h"
 #include "BreakableBlock.h"
 #include "FakeBlock.h"
+#include "SpecialVillain.h"
+#include "SimpleVillain.h"
 
 Labyrinth::Labyrinth() : IG2Object() {
 }
@@ -65,14 +66,23 @@ void Labyrinth::createLabyrinth(std::istream& input, IG2Project* ig2) {
 
 				_characters.push_back(ig2->createPlayer(playerPos));
 			}
-			else if (cell == VILLAIN) {
+			else if (cell == VILLAIN_NORMAL) {
 				block = createBlock(nextPos, EMPTY); // donde esta el jugador solo puede haber un bloque vacio
 
 				Vector3 villainPos = _labyrinthOrigin;
 				villainPos.x += iCol * BLOCK_SIZE;
 				villainPos.z += iRow * BLOCK_SIZE;
 
-				ig2->createPlayer(villainPos);
+				_characters.push_back(new SimpleVillain(villainPos, mSM->getRootSceneNode()->createChildSceneNode("villain"), mSM));
+			}
+			else if (cell == VILLAIN_SPECIAL) {
+				block = createBlock(nextPos, EMPTY); // donde esta el jugador solo puede haber un bloque vacio
+
+				Vector3 villainPos = _labyrinthOrigin;
+				villainPos.x += iCol * BLOCK_SIZE;
+				villainPos.z += iRow * BLOCK_SIZE;
+
+				_characters.push_back(new SpecialVillain(villainPos, mSM->getRootSceneNode()->createChildSceneNode("villain"), mSM));
 			}
 
 			_blocks[iRow][iCol] = block;
@@ -122,7 +132,7 @@ Vector3 Labyrinth::getCubeResizeScale(IG2Object* cube) {
 }
 
 void Labyrinth::moveCharacter(Character* character, Real time) {
-	// Get the block where the character is placed, and the next one
+	// Get the block where the character is placed
 	Block* currentBlock = getBlock(character->getPosition());
 
 	if (currentBlock == nullptr)
@@ -148,7 +158,6 @@ void Labyrinth::moveCharacter(Character* character, Real time) {
 			}
 
 			if (character->is180Turn()) {
-				std::cout << "180 turn\n";
 				character->rotateToNewDirection();
 				return;
 			}
@@ -186,7 +195,7 @@ Block* Labyrinth::getBlock(Vector3 position) {
 }
 
 bool Labyrinth::blockCenterReached(Vector3 difference, Vector3 direction) {
-	const Real tolerance = 0.1f; // floating point value tolerance
+	const Real tolerance = 0.1f;
 
 	if (direction.x > 0)
 		return difference.x >= -tolerance;
