@@ -32,7 +32,7 @@ void Labyrinth::createLabyrinth(std::istream& input, IG2Project* ig2) {
 	_blocks = std::vector<std::vector<Block*>>(_numRows, std::vector<Block*>(_numCols));
 
 	Vector3 absoluteStartingPos = { -(float)(_numRows*BLOCK_SIZE)/2.f, 0, -(float)(_numCols*BLOCK_SIZE)/2.f };
-	_labyrinthOrigin = { getPosition().x + absoluteStartingPos.x, 0, getPosition().z + absoluteStartingPos.z };
+	_labyrinthOrigin = getPosition() + absoluteStartingPos;
 	Vector3 nextPos = _labyrinthOrigin;
 
 	while (iRow < _numRows) {
@@ -188,8 +188,6 @@ Block* Labyrinth::getBlock(Vector3 position) {
 		col < 0 || col >= _numCols) {
 		return nullptr;
 	}
-
-	//std::cout << row << ' ' << col << '\n';
 
 	return _blocks[row][col];
 }
