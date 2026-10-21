@@ -84,9 +84,9 @@ void IG2Project::setupScene(void) {
     createFloor();
     createMap();
 
-    SpecialVillain* villain = new SpecialVillain(Vector3{200, 0, 0}, mSM->getRootSceneNode()->createChildSceneNode("villain"), mSM);
-    villain->setInitialPosition({ villain->getPosition().x, villain->getPosition().y + villain->calculateBoxSize().y / 2.f, villain->getPosition().z });
-    villain->setPosition(villain->getInitialPosition());
+    _villain = new SpecialVillain(Vector3{200, 0, 0}, mSM->getRootSceneNode()->createChildSceneNode("villain"), mSM);
+    _villain->setInitialPosition({ _villain->getPosition().x, _villain->getPosition().y + _villain->calculateBoxSize().y / 2.f, _villain->getPosition().z });
+    _villain->setPosition(_villain->getInitialPosition());
 }
 
 void IG2Project::createCamera() {
@@ -158,5 +158,9 @@ Character* IG2Project::createPlayer(Vector3 position) {
 void IG2Project::frameRendered(const Ogre::FrameEvent& evt) {
     if (_labyrinth != nullptr) {
         _labyrinth->updateLabyrinth(evt.timeSinceLastFrame);
+    }
+
+    if (_villain != nullptr) {
+        _villain->update(evt.timeSinceLastFrame);
     }
 }

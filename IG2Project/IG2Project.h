@@ -19,6 +19,7 @@
 class Player;
 class Labyrinth;
 class Character;
+class SpecialVillain;
 
 static const std::string MAP_NAME = "../../IG2Project/IG2Project/IG2Media/stage1b.txt";
 
@@ -39,6 +40,7 @@ protected:
 
     Player* _player = nullptr;
     Labyrinth* _labyrinth = nullptr;
+    SpecialVillain* _villain = nullptr;
 
     Ogre::SceneManager* mSM = nullptr;
     OgreBites::TrayManager* mTrayMgr = nullptr;

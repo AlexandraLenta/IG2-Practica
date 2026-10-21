@@ -2,169 +2,138 @@
 
 SpecialVillain::SpecialVillain(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, float sp, int l) : Villain(initPos, node, sceneMng, sp, l) {
     setup();
+
+    _timer = new Ogre::Timer();
+}
+
+SpecialVillain::~SpecialVillain() {
+    delete _timer;
+    _timer = nullptr;
+}
+
+void SpecialVillain::update(Real dt) {
+    // total seconds passed -- for periodical movement
+    float t = _timer->getMilliseconds() / 1000.f;
+
+    // WHEEL SPIN -------------
+    float wheelDegPerSec = 360.f; // full spin in one second
+
+    // uses dt for continuous movement
+    for (int i = 0; i < _wheelsSign.size(); i++) {
+        _wheelsSign[i].first->rotate(Ogre::Vector3::UNIT_Y, Ogre::Degree(_wheelsSign[i].second * wheelDegPerSec * dt));
+        _swords[i]->setPosition(Ogre::Vector3{ 0, 0, 0 } + Ogre::Vector3(0, 5.f * std::sin(t * 6.f), 0));
+    }
+
+    // TOP TURN -----------------------
+    float yaw = 30.f * std::sin(t * 1.5f);
+    _top->setOrientation(Ogre::Quaternion(Ogre::Degree(yaw), Vector3::UNIT_Y));
+
+    // HEAD UP & DOWN --------------------
+    _head->setPosition(_headBasePos + Ogre::Vector3(0, 5.f * std::sin(t * 6.f), 0));
 }
 
 void SpecialVillain::setup() {
-    // Creates a new entity with the mesh and attach the entity
-    entity = mSM->createEntity("cube.mesh"); // body
+    // BODY --------------------------
+    entity = mSM->createEntity(BODY_MESH); 
     mNode->attachObject(entity);
     this->setPosition(initialPosition);
     mNode->setScale(0.15, 0.1, 0.15);
 
     Vector3 bodySize = calculateNodeBoxSize(mNode);
 
-    Real halfW = bodySize.x / 2.0f;
     Real halfH = bodySize.y / 2.0f;
-    Real halfD = bodySize.z / 2.0f;
 
     mNode->setPosition(initialPosition.x, initialPosition.y + halfH/7.f, initialPosition.z);
 
-    //mNode->setVisible(false);
+    // TOP ----------------------------
+    _top = createPart(mNode, TOP_MESH, TOP_SCALE);
 
-    Ogre::SceneNode* top = mNode->createChildSceneNode("villainTop"); // top part
-    Ogre::Entity* ent = mSM->createEntity("sphere.mesh");
-    top->attachObject(ent);
-
-    top->setScale(0.2, 0.15, 0.2);
-
-    Vector3 topSize = calculateNodeBoxSize(top);
+    Vector3 topSize = calculateNodeBoxSize(_top);
 
     Real topHalfH = topSize.y / (2.0f * mNode->getScale().y);
 
-    top->setPosition(0, halfH + topHalfH/3.f, 0);
-    
-    //top->setVisible(false);
+    _top->setPosition(0, halfH + topHalfH/3.f, 0);
 
-    Ogre::SceneNode* head = top->createChildSceneNode("villainHead"); // head of the tank user
-    ent = mSM->createEntity("DamagedHelmet.mesh");
-    head->attachObject(ent);
+    // HEAD ----------------------------
+    _head = createPart(_top, HEAD_MESH, HEAD_SCALE);
 
-    head->setScale({ 60, 120, 60 });
+    Vector3 headSize = calculateNodeBoxSize(_head);
 
-    Vector3 headSize = calculateNodeBoxSize(head);
+    Real headHalfH = headSize.y / 2.0f / _top->getScale().y;
 
-    Real headHalfH = headSize.y / 2.0f / top->getScale().y;
+    _head->setPosition(0, headHalfH/5.f, 0);
+    _headBasePos = _head->getPosition();
 
-    head->setPosition(0, headHalfH/5.f, 0);
+    // GUN ------------------------------
+    _gun = createPart(_top, GUN_MESH, GUN_SCALE);
 
-    // gun attached to the top part
-    Ogre::SceneNode* gun = top->createChildSceneNode("villainGun");
-    ent = mSM->createEntity("fish.mesh");
-    gun->attachObject(ent);
+    Vector3 gunSize = calculateNodeBoxSize(_gun);
 
-    gun->setScale(40, 30, 20);
+    Real gunHalfD = gunSize.z / 2.0f / _top->getScale().z;
+    Real topHalfD = topSize.z / 2.0f / _top->getScale().z;
 
-    Vector3 gunSize = calculateNodeBoxSize(gun);
+    _gun->rotate(Ogre::Vector3::UNIT_Y, Ogre::Degree(90));
+    _gun->rotate(Ogre::Vector3::UNIT_Z, Ogre::Degree(-45));
+    _gun->setPosition(0, 1.5f*topHalfH, topHalfD + gunHalfD/2.f);
 
-    Real gunHalfD = gunSize.z / 2.0f / top->getScale().z;
-    Real topHalfD = topSize.z / 2.0f / top->getScale().z;
+    // WHEELS ----------------------------
+    _wheelsSign.push_back({ createWheel(1, true, true), -1 });   // front left
+    _wheelsSign.push_back({ createWheel(2, false, true), 1 });   // front right
+    _wheelsSign.push_back({ createWheel(3, true, false), -1 });  // back left
+    _wheelsSign.push_back({ createWheel(4, false, false), 1 });  // back right
+}
 
-    gun->rotate(Ogre::Vector3::UNIT_Y, Ogre::Degree(90));
-    gun->rotate(Ogre::Vector3::UNIT_Z, Ogre::Degree(-45));
-    gun->setPosition(0, 1.5f*topHalfH, topHalfD + gunHalfD/2.f);
+Ogre::SceneNode* SpecialVillain::createPart(Ogre::SceneNode* parent, const std::string& mesh, const Vector3& scale) {
+    Ogre::SceneNode* node = parent->createChildSceneNode();
+    node->attachObject(mSM->createEntity(mesh));
+    node->setScale(scale);
+    return node;
+}
 
-    // WHEELS
+Ogre::SceneNode* SpecialVillain::createWheel(int id, bool left, bool front) {
+    const Vector3 WHEEL_SCALE = { 6, 1.8, 6 };
+    const Vector3 WHEEL_HEAD_SCALE = { 0.08, 0.27, 0.03 };
+    const Vector3 WHEEL_SWORD_SCALE = { 1, 3.33, 1 };
 
-    Vector3 WHEEL_SCALE = { 6, 1.8, 6 };
-    Vector3 WHEEL_HEAD_SCALE = { 0.08, 0.08 / 0.3, 0.03 };
-     
-    // wheel 1
-    Ogre::SceneNode* wheel1 = mNode->createChildSceneNode("villainWheel1"); // front left
-    ent = mSM->createEntity("Barrel.mesh");
-    wheel1->attachObject(ent);
-    wheel1->setScale(WHEEL_SCALE);
-    
-    Vector3 wheel1Size = calculateNodeBoxSize(wheel1);
+    const std::string idStr = std::to_string(id);
 
-    Real wheelHalfW = wheel1Size.x / 2.0f / mNode->getScale().x;
+    // signs depend on bools
+    const Real sideX = left ? -1.f : 1.f;   // left: -X, right: +X
+    const Real sideZ = front ? 1.f : -1.f;  // front: +Z, back: -Z
 
-    Real wheelHalfH = wheel1Size.y / 4.0f / mNode->getScale().y;
+    // Altura media del cuerpo (para colocar la rueda debajo)
+    Real halfH = calculateNodeBoxSize(mNode).y / 2.0f;
+
+    // Rueda
+    Ogre::SceneNode* wheel = createPart(mNode, WHEEL_MESH, WHEEL_SCALE);
+
+    Vector3 wheelSize = calculateNodeBoxSize(wheel);
+    Real wheelHalfW = wheelSize.x / 2.0f / mNode->getScale().x;
+    Real wheelHalfH = wheelSize.y / 4.0f / mNode->getScale().y;
 
     Real WHEEL_POS_Y = -wheelHalfH - halfH;
     Real WHEEL_POS_X = wheelHalfW / 1.95f;
-    Real WHEEL_POS_Z = wheelHalfW /2.1f;
+    Real WHEEL_POS_Z = wheelHalfW / 2.1f;
 
-    wheel1->rotate(Ogre::Vector3::UNIT_Z, Ogre::Degree(90));
-    wheel1->setPosition(-WHEEL_POS_X, WHEEL_POS_Y, WHEEL_POS_Z);
-    //wheel1->setVisible(false);
+    // izquierda: +90 en Z, derecha: -90 en Z
+    wheel->rotate(Ogre::Vector3::UNIT_Z, Ogre::Degree(-sideX * 90));
+    wheel->setPosition(sideX * WHEEL_POS_X, WHEEL_POS_Y, sideZ * WHEEL_POS_Z);
 
-    Ogre::SceneNode* wheelHead1 = wheel1->createChildSceneNode("villainWheelDeco1"); // decoration inside of wheel
-    ent = mSM->createEntity("ogrehead.mesh");
-    wheelHead1->attachObject(ent);
-    wheelHead1->setPosition(0, wheelHalfH / 4.f, 0);
-    wheelHead1->setScale(WHEEL_HEAD_SCALE);
-    wheelHead1->rotate(Ogre::Vector3::UNIT_Y, Ogre::Degree(-90), Ogre::Node::TS_WORLD);
-    wheelHead1->rotate(Ogre::Vector3::UNIT_X, Ogre::Degree(90), Ogre::Node::TS_WORLD);
+    // Decoración (cabeza de ogro) dentro de la rueda
+    Ogre::SceneNode* wheelHead = createPart(wheel, WHEEL_DECO_MESH, WHEEL_HEAD_SCALE);
+    wheelHead->setPosition(0, wheelHalfH / 4.f, 0);
+    wheelHead->rotate(Ogre::Vector3::UNIT_Y, Ogre::Degree(sideX * 90), Ogre::Node::TS_WORLD);
+    wheelHead->rotate(Ogre::Vector3::UNIT_X, Ogre::Degree(90), Ogre::Node::TS_WORLD);
 
-    // wheel 2
-    Ogre::SceneNode* wheel2 = mNode->createChildSceneNode("villainWheel2"); // front right
-    ent = mSM->createEntity("Barrel.mesh");
-    wheel2->attachObject(ent);
-    wheel2->setScale(WHEEL_SCALE);
+    // Decoración (espada) dentro de la rueda
+    Ogre::SceneNode* wheelSword = createPart(wheel, WHEEL_DECO2_MESH, WHEEL_SWORD_SCALE);
+    wheelSword->setPosition(0, 0, 0);
+    wheelSword->rotate(Ogre::Vector3::UNIT_Y, Ogre::Degree(sideX * 90), Ogre::Node::TS_WORLD);
+    wheelSword->rotate(Ogre::Vector3::UNIT_X, Ogre::Degree(90), Ogre::Node::TS_WORLD);
 
-    Vector3 wheel2Size = calculateNodeBoxSize(wheel2);
+    _swords.push_back(wheelSword);
 
-    wheelHalfW = wheel2Size.x / 2.0f / mNode->getScale().x;
-
-    wheel2->setPosition(WHEEL_POS_X, WHEEL_POS_Y, WHEEL_POS_Z);
-    wheel2->rotate(-Ogre::Vector3::UNIT_Z, Ogre::Degree(90));
-    //wheel2->setVisible(false);
-
-    Ogre::SceneNode* wheelHead2 = wheel2->createChildSceneNode("villainWheelDeco2"); // decoration inside of wheel
-    ent = mSM->createEntity("ogrehead.mesh");
-    wheelHead2->attachObject(ent);
-    wheelHead2->setScale(WHEEL_HEAD_SCALE);
-    wheelHead2->rotate(Ogre::Vector3::UNIT_Y, Ogre::Degree(90), Ogre::Node::TS_WORLD);
-    wheelHead2->rotate(Ogre::Vector3::UNIT_X, Ogre::Degree(90), Ogre::Node::TS_WORLD);
-    wheelHead2->setPosition(0, wheelHalfH / 4.f, 0);
-
-    // wheel 3
-    Ogre::SceneNode* wheel3 = mNode->createChildSceneNode("villainWheel3"); // back left
-    ent = mSM->createEntity("Barrel.mesh");
-    wheel3->attachObject(ent);
-    wheel3->setScale(WHEEL_SCALE);
-
-    wheel3->rotate(Ogre::Vector3::UNIT_Z, Ogre::Degree(90));
-
-    Vector3 wheel3Size = calculateNodeBoxSize(wheel3);
-
-    wheelHalfW = wheel3Size.x / 2.0f / mNode->getScale().x;
-
-    wheel3->setPosition(-WHEEL_POS_X, WHEEL_POS_Y, -WHEEL_POS_Z);
-    //wheel3->setVisible(false);
-
-    Ogre::SceneNode* wheelHead3 = wheel3->createChildSceneNode("villainWheelDeco3"); // decoration inside of wheel
-    ent = mSM->createEntity("ogrehead.mesh");
-    wheelHead3->attachObject(ent);
-    wheelHead3->setScale(WHEEL_HEAD_SCALE);
-
-    wheelHead3->setPosition(0, wheelHalfH / 4.f, 0);
-    wheelHead3->rotate(Ogre::Vector3::UNIT_Y, Ogre::Degree(-90), Ogre::Node::TS_WORLD);
-    wheelHead3->rotate(Ogre::Vector3::UNIT_X, Ogre::Degree(90), Ogre::Node::TS_WORLD);
-
-    // wheel 4
-    Ogre::SceneNode* wheel4 = mNode->createChildSceneNode("villainWheel4"); // back right
-    ent = mSM->createEntity("Barrel.mesh");
-    wheel4->attachObject(ent);
-    wheel4->setScale(WHEEL_SCALE);
-
-    wheel4->rotate(-Ogre::Vector3::UNIT_Z, Ogre::Degree(90));
-
-    Vector3 wheel4Size = calculateNodeBoxSize(wheel4);
-
-    wheelHalfW = wheel4Size.x / 2.0f / mNode->getScale().x;
-
-    wheel4->setPosition(WHEEL_POS_X, WHEEL_POS_Y, -WHEEL_POS_Z);
-    //wheel4->setVisible(false);
-
-    Ogre::SceneNode* wheelHead4 = wheel4->createChildSceneNode("villainWheelDeco4"); // decoratin inside of wheel
-    ent = mSM->createEntity("ogrehead.mesh");
-    wheelHead4->attachObject(ent);
-    wheelHead4->setScale(WHEEL_HEAD_SCALE);
-
-    wheelHead4->setPosition(0, wheelHalfH / 4.f, 0);
-    wheelHead4->rotate(Ogre::Vector3::UNIT_Y, Ogre::Degree(90), Ogre::Node::TS_WORLD);
-    wheelHead4->rotate(Ogre::Vector3::UNIT_X, Ogre::Degree(90), Ogre::Node::TS_WORLD);
+    return wheel;
 }
 
 Vector3 SpecialVillain::calculateNodeBoxSize(Ogre::SceneNode* node) {
