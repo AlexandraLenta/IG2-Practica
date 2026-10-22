@@ -37,38 +37,15 @@ void SpecialVillain::update(Real dt) {
 }
 
 Ogre::Vector3 SpecialVillain::chooseDirection(const Labyrinth& l) {
-    std::vector<Vector2> possibleNextDirs;
-    const Block* b;
+    Ogre::Vector2 dir = bfs(l.getBlocks(), 
+        l.getBlockRowColFromPos({ getPosition().x, getPosition().z }), 
+        l.getBlockRowColFromPos({l.getPlayer()->getPosition().x, l.getPlayer()->getPosition().z }));
 
-    const Block* playerBlock = l.getBlock(l.getPlayer()->getPosition());
+    if (dir == Ogre::Vector2::ZERO)
+        return getGridOrientation();   // on the player, or unreachable: keep going
 
-    if (playerBlock == nullptr)
-        return getGridOrientation();
-
-    Vector2 target =  { playerBlock->getPosition().x, playerBlock->getPosition().z };
-
-    Vector2 best = Vector2::ZERO;
-    Real bestDist = std::numeric_limits<Real>::max();
-
-    for (Vector2 d : _directions) {
-        const Block* b = l.getBlock(Vector2{ getPosition().x, getPosition().z} + d * l.BLOCK_SIZE);
-        if (b == nullptr || !b->canPassThrough())
-            continue;
-
-        Real dist = Vector2{ b->getPosition().x, b->getPosition().z }.distance(target);
-        if (dist < bestDist) {
-            std::cout << "better dist: " << dist << "than: " << bestDist << "\n";
-            bestDist = dist;
-            best = d;
-        }
-    }
-
-    if (best == Vector2::ZERO || bestDist == std::numeric_limits<Real>::max())  // nowhere to go, keep direction
-        return getGridOrientation();
-
-    setNewDir(best);
-
-    return { best.x, 0, best.y };
+    setNewDir(dir);
+    return { dir.x, 0, dir.y };
 }
 
 Ogre::Vector2 SpecialVillain::bfs(std::vector<std::vector<Block*>> blocks, std::pair<int, int> origin, std::pair<int, int> target) {
@@ -94,12 +71,13 @@ Ogre::Vector2 SpecialVillain::bfs(std::vector<std::vector<Block*>> blocks, std::
 
             if (isBlockValid(ni, nj, rows, cols) && !visited[ni][nj] && blocks[ni][nj]->canPassThrough()) {
                 visited[ni][nj] = true;
-                q.push({ ni, nj });
 
                 firstDir[ni][nj] = (std::pair(i, j) == origin) ? k : firstDir[i][j]; // if we are in origin, we take current dir, if we are not, we inherit parent dir
 
                 if (std::pair(ni, nj) == target)
                     return _directions[firstDir[ni][nj]];
+
+                q.push({ ni, nj });
             }
         }
     }

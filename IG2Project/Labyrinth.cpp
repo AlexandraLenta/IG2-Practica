@@ -219,7 +219,6 @@ void Labyrinth::updateLabyrinth(Real time) {
 	}
 }
 
-
 std::vector<std::vector<Block*>> Labyrinth::getBlocks() const {
 	return _blocks;
 }
