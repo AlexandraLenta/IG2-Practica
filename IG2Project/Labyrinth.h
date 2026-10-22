@@ -49,7 +49,7 @@ public:
     void updateLabyrinth(Real time);
     void moveCharacter(Character* character, Real time);
 
-    Character* getPlayer();
+    Character* getPlayer() const;
 
     /// <summary>
     /// Get the block corresponding to given position.
@@ -57,8 +57,20 @@ public:
     /// <param name="position">The position to check.</param>
     /// <returns>Pointer to the block object in given position.</returns>
     Block* getBlock(Vector3 position) const;
-
     Block* getBlock(Vector2 position) const;
+
+    /// <summary>
+    /// Get the list of blocks.
+    /// </summary>
+    /// <returns></returns>
+    std::vector<std::vector<Block*>> getBlocks() const;
+
+    /// <summary>
+    /// Returns pair<row, col> of the block in given position.
+    /// </summary>
+    /// <param name="position"></param>
+    /// <returns></returns>
+    std::pair<int, int> getBlockRowColFromPos(Vector2 position) const;
 
 private:
     int _numRows, _numCols; 

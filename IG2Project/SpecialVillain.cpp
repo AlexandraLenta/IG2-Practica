@@ -1,4 +1,8 @@
 #include "SpecialVillain.h"
+#include <limits>
+#include "Labyrinth.h"
+#include "Block.h"
+#include <queue>
 
 SpecialVillain::SpecialVillain(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, float sp, int l) : Villain(initPos, node, sceneMng, sp, l) {
     setup();
@@ -33,7 +37,76 @@ void SpecialVillain::update(Real dt) {
 }
 
 Ogre::Vector3 SpecialVillain::chooseDirection(const Labyrinth& l) {
-    return { 0, 0, 0 };
+    std::vector<Vector2> possibleNextDirs;
+    const Block* b;
+
+    const Block* playerBlock = l.getBlock(l.getPlayer()->getPosition());
+
+    if (playerBlock == nullptr)
+        return getGridOrientation();
+
+    Vector2 target =  { playerBlock->getPosition().x, playerBlock->getPosition().z };
+
+    Vector2 best = Vector2::ZERO;
+    Real bestDist = std::numeric_limits<Real>::max();
+
+    for (Vector2 d : _directions) {
+        const Block* b = l.getBlock(Vector2{ getPosition().x, getPosition().z} + d * l.BLOCK_SIZE);
+        if (b == nullptr || !b->canPassThrough())
+            continue;
+
+        Real dist = Vector2{ b->getPosition().x, b->getPosition().z }.distance(target);
+        if (dist < bestDist) {
+            std::cout << "better dist: " << dist << "than: " << bestDist << "\n";
+            bestDist = dist;
+            best = d;
+        }
+    }
+
+    if (best == Vector2::ZERO || bestDist == std::numeric_limits<Real>::max())  // nowhere to go, keep direction
+        return getGridOrientation();
+
+    setNewDir(best);
+
+    return { best.x, 0, best.y };
+}
+
+Ogre::Vector2 SpecialVillain::bfs(std::vector<std::vector<Block*>> blocks, std::pair<int, int> origin, std::pair<int, int> target) {
+    if (origin == target)
+        return Ogre::Vector2::ZERO;
+
+    const int rows = blocks.size(), cols = blocks[0].size();
+
+    std::vector<std::vector<bool>> visited(blocks.size(), std::vector<bool>(blocks[0].size(), false));
+    std::vector<std::vector<int>>  firstDir(rows, std::vector<int>(cols, -1));  // index in _directions
+
+    std::queue<std::pair<int, int>> q;
+
+    q.push(origin);
+    visited[origin.first][origin.second] = true;
+
+    while (!q.empty()) {
+        auto v = q.front(); q.pop();
+        int i = v.first, j = v.second;
+
+        for (int k = 0; k < _directions.size(); k++) {
+            int ni = i + _directions[k].y, nj = j + _directions[k].x;
+
+            if (isBlockValid(ni, nj, rows, cols) && !visited[ni][nj] && blocks[ni][nj]->canPassThrough()) {
+                visited[ni][nj] = true;
+                q.push({ ni, nj });
+
+                firstDir[ni][nj] = (std::pair(i, j) == origin) ? k : firstDir[i][j]; // if we are in origin, we take current dir, if we are not, we inherit parent dir
+
+                if (std::pair(ni, nj) == target)
+                    return _directions[firstDir[ni][nj]];
+            }
+        }
+    }
+}
+
+bool SpecialVillain::isBlockValid(int i, int j, int ROWS, int COLS) {
+    return i < ROWS && i >= 0 && j < COLS && j >= 0;
 }
 
 void SpecialVillain::setup() {

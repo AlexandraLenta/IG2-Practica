@@ -1,4 +1,7 @@
 #include "Villain.h"
+#include "Block.h"
+#include "Labyrinth.h"
+
 Villain::Villain(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, float sp, int l) : Character(initPos, node, sceneMng, sp, l) {
 }
 

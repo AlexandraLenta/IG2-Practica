@@ -9,7 +9,4 @@ public:
     Ogre::Vector3 chooseDirection(const Labyrinth& l) override;
 private:
     void setup() override;
-
-    const std::vector<Vector2> _directions = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
 };
-

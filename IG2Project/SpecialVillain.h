@@ -2,6 +2,8 @@
 #include "Villain.h"
 #include "OgreTimer.h"
 
+class Block;
+
 class SpecialVillain :
 	public Villain
 {
@@ -38,4 +40,7 @@ protected:
 	Ogre::SceneNode* createPart(Ogre::SceneNode* parent, const std::string& mesh, const Vector3& scale);
 
 	Vector3 calculateNodeBoxSize(Ogre::SceneNode* node);
+
+	Ogre::Vector2 bfs(std::vector<std::vector<Block*>> blocks, std::pair<int, int> origin, std::pair<int, int> target);
+	bool isBlockValid(int i, int j, int ROWS, int COLS);
 };

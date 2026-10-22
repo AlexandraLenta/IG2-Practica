@@ -23,7 +23,7 @@ Labyrinth::~Labyrinth() {
 	_blocks.clear();
 }
 
-Character* Labyrinth::getPlayer() {
+Character* Labyrinth::getPlayer() const {
 	return _player;
 }
 
@@ -197,22 +197,9 @@ Block* Labyrinth::getBlock(Vector3 position) const {
 }
 
 Block* Labyrinth::getBlock(Vector2 position) const {
-	Vector2 relative = position - Vector2{ _labyrinthOrigin.x, _labyrinthOrigin.z} ;
+	auto p = getBlockRowColFromPos(position);
 
-	int col = static_cast<int>(
-		std::round(relative.x / BLOCK_SIZE)
-		);
-
-	int row = static_cast<int>(
-		std::round(relative.y / BLOCK_SIZE)
-		);
-
-	if (row < 0 || row >= _numRows ||
-		col < 0 || col >= _numCols) {
-		return nullptr;
-	}
-
-	return _blocks[row][col];
+	return _blocks[p.first][p.second];
 }
 
 bool Labyrinth::blockCenterReached(Real before, Real after) {
@@ -230,4 +217,28 @@ void Labyrinth::updateLabyrinth(Real time) {
 		ch->update(time);
 		moveCharacter(ch, time);
 	}
+}
+
+
+std::vector<std::vector<Block*>> Labyrinth::getBlocks() const {
+	return _blocks;
+}
+
+std::pair<int, int> Labyrinth::getBlockRowColFromPos(Vector2 position) const {
+	Vector2 relative = position - Vector2{ _labyrinthOrigin.x, _labyrinthOrigin.z };
+
+	int col = static_cast<int>(
+		std::round(relative.x / BLOCK_SIZE)
+		);
+
+	int row = static_cast<int>(
+		std::round(relative.y / BLOCK_SIZE)
+		);
+
+	if (row < 0 || row >= _numRows ||
+		col < 0 || col >= _numCols) {
+		return { -1, -1 };
+	}
+
+	return { row, col };
 }

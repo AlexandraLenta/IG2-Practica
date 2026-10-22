@@ -102,7 +102,7 @@ public:
      * Gets the position of this element.
      * @return Position of this element.
      */
-    Vector3 getPosition();
+    Vector3 getPosition() const;
 
     /**
      * Sets the scale for this element.

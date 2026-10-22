@@ -64,7 +64,7 @@ void IG2Object::setPosition(Vector3 v) {
     mNode->setPosition(v);
 }
 
-Vector3 IG2Object::getPosition() {
+Vector3 IG2Object::getPosition() const {
     return mNode->getPosition();
 }
 

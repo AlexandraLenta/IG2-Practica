@@ -23,7 +23,7 @@ Ogre::Vector3 SimpleVillain::chooseDirection(const Labyrinth& l) {
 	for (int i = 0; i < _directions.size(); i++) {
 		b = l.getBlock(Vector2{ getPosition().x, getPosition().z } + _directions[i] * l.BLOCK_SIZE);
 
-		if (b!= nullptr && b->canPassThrough()) {
+		if (b != nullptr && b->canPassThrough()) {
 			possibleNextDirs.push_back(_directions[i]);
 			//std::cout << "block at " << _directions[i].x << ' ' << _directions[i].y << " possible!\n";
 		}
