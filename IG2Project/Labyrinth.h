@@ -49,11 +49,21 @@ public:
     void updateLabyrinth(Real time);
     void moveCharacter(Character* character, Real time);
 
+    Character* getPlayer();
+
+    /// <summary>
+    /// Get the block corresponding to given position.
+    /// </summary>
+    /// <param name="position">The position to check.</param>
+    /// <returns>Pointer to the block object in given position.</returns>
+    Block* getBlock(Vector3 position) const;
+
 private:
     int _numRows, _numCols; 
     Vector3 _labyrinthOrigin;
     std::vector<std::vector<Block*>> _blocks;
     std::vector<Character*> _characters;
+    Character* _player = nullptr;
 
     /// <summary>
     /// Creates the labyrinth structure.
@@ -73,16 +83,9 @@ private:
     Vector3 getCubeResizeScale(IG2Object* cube);
 
     /// <summary>
-    /// Get the block corresponding to given position.
+    /// Check if the character has reached the center of the block.
     /// </summary>
-    /// <param name="position">The position to check.</param>
-    /// <returns>Pointer to the block object in given position.</returns>
-    Block* getBlock(Vector3 position);
-
-    /// <summary>
-    /// Check if the player has reached the center of the block.
-    /// </summary>
-    /// <param name="difference">The difference between the center of the block and the player's position.</param>
+    /// <param name="difference">The difference between the center of the block and the character's position.</param>
     /// <param name="direction">The direction in which the player is heading.</param>
     /// <returns></returns>
     bool blockCenterReached(Vector3 difference, Vector3 direction);

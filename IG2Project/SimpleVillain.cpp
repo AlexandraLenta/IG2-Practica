@@ -9,4 +9,5 @@ void SimpleVillain::setup() {
 	entity = mSM->createEntity("ogrehead.mesh");
 	mNode->attachObject(entity);
 	this->setPosition(initialPosition);
+	mNode->setScale(0.1, 0.1, 0.1);
 }

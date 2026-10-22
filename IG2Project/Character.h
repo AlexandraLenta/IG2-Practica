@@ -2,6 +2,8 @@
 
 #include "IG2Object.h"
 
+class Labyrinth;
+
 class Character : public IG2Object
 {
 public:
@@ -33,6 +35,8 @@ public:
 
     void moveCharacter(Real time);
     virtual void update(Real time);
+
+    virtual Ogre::Vector3 chooseDirection(const Labyrinth& l) = 0;
 
 protected:
     int _life;

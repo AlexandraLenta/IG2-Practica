@@ -2,7 +2,7 @@
 
 SpecialVillain::SpecialVillain(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, float sp, int l) : Villain(initPos, node, sceneMng, sp, l) {
     setup();
-
+    mNode->setScale(mNode->getScale() * 0.6);
     _timer = new Ogre::Timer();
 }
 

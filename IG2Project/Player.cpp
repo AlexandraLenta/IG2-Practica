@@ -1,4 +1,6 @@
 #include "Player.h"
+#include "Labyrinth.h"
+#include "Block.h"
 
 Player::Player(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh, float sp, int l, int pts) : Character(initPos, node, sceneMng, mesh, sp, l), _points(pts) {
 
@@ -10,4 +12,8 @@ int Player::getPoints() {
 
 void Player::setPoints(int p) {
     _points = p;
+}
+
+Vector3 Player::chooseDirection(const Labyrinth& l) {
+    return getNextDirVector();
 }

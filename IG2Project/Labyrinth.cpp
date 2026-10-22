@@ -23,6 +23,10 @@ Labyrinth::~Labyrinth() {
 	_blocks.clear();
 }
 
+Character* Labyrinth::getPlayer() {
+	return _player;
+}
+
 void Labyrinth::createLabyrinth(std::istream& input, IG2Project* ig2) {
 	int iRow = 0, iCol = 0;
 	char cell;
@@ -64,7 +68,8 @@ void Labyrinth::createLabyrinth(std::istream& input, IG2Project* ig2) {
 				playerPos.x += iCol * BLOCK_SIZE;
 				playerPos.z += iRow * BLOCK_SIZE;
 
-				_characters.push_back(ig2->createPlayer(playerPos));
+				_player = ig2->createPlayer(playerPos);
+				_characters.push_back(_player);
 			}
 			else if (cell == VILLAIN_NORMAL) {
 				block = createBlock(nextPos, EMPTY); // donde esta el jugador solo puede haber un bloque vacio
@@ -73,7 +78,7 @@ void Labyrinth::createLabyrinth(std::istream& input, IG2Project* ig2) {
 				villainPos.x += iCol * BLOCK_SIZE;
 				villainPos.z += iRow * BLOCK_SIZE;
 
-				_characters.push_back(new SimpleVillain(villainPos, mSM->getRootSceneNode()->createChildSceneNode("villain"), mSM));
+				_characters.push_back(new SimpleVillain(villainPos, mSM->getRootSceneNode()->createChildSceneNode(), mSM));
 			}
 			else if (cell == VILLAIN_SPECIAL) {
 				block = createBlock(nextPos, EMPTY); // donde esta el jugador solo puede haber un bloque vacio
@@ -82,7 +87,7 @@ void Labyrinth::createLabyrinth(std::istream& input, IG2Project* ig2) {
 				villainPos.x += iCol * BLOCK_SIZE;
 				villainPos.z += iRow * BLOCK_SIZE;
 
-				_characters.push_back(new SpecialVillain(villainPos, mSM->getRootSceneNode()->createChildSceneNode("villain"), mSM));
+				_characters.push_back(new SpecialVillain(villainPos, mSM->getRootSceneNode()->createChildSceneNode(), mSM));
 			}
 
 			_blocks[iRow][iCol] = block;
@@ -132,48 +137,90 @@ Vector3 Labyrinth::getCubeResizeScale(IG2Object* cube) {
 }
 
 void Labyrinth::moveCharacter(Character* character, Real time) {
-	// Get the block where the character is placed
-	Block* currentBlock = getBlock(character->getPosition());
+	Block* currBlock = getBlock(character->getPosition());
 
-	if (currentBlock == nullptr)
-		return;
+	Vector3 currDir = character->getGridOrientation();
 
-	Vector3 currentDir = character->getGridOrientation();
+	Vector3 newPos = currDir * character->getSpeed() * time + character->getPosition();
 
-	Block* inFrontBlock = getBlock(character->getPosition() + currentDir * BLOCK_SIZE);
+	Vector3 difference = newPos - currBlock->getPosition();
 
-	Vector3 newPos = currentDir * character->getSpeed() * time + character->getPosition();
+	Block* inFrontBlock = getBlock(character->getPosition() + currDir * BLOCK_SIZE);
 
-	Vector3 difference = newPos - currentBlock->getPosition();
+	// if we reach or pass the center of the current block in this frame
+	if (blockCenterReached(difference, currDir)) {
+		std::cout << "block center reached\n";
+		Vector3 newDir = character->chooseDirection(*this);
 
-	// Player trying to change position
-	if (character->isDirectionModified()) {
-		Block* nextBlock = getBlock(character->getPosition() + character->getNextDirVector() * BLOCK_SIZE);
-
-		// if we've reached the center, see if new direction is valid
-		if (blockCenterReached(difference, currentDir)) {
-			if (nextBlock != nullptr && nextBlock->canPassThrough()) {
-				character->rotateToNewDirection();
-				return;
-			}
-
-			if (character->is180Turn()) {
-				character->rotateToNewDirection();
-				return;
-			}
+		Block* nextBlock = getBlock(character->getPosition() + newDir * BLOCK_SIZE);
+		
+		if (nextBlock != nullptr && nextBlock->canPassThrough()) {
+			character->rotateToNewDirection();
+			inFrontBlock = nextBlock;
+		}
+			
+		if (character->is180Turn()) {
+			character->rotateToNewDirection();
+			inFrontBlock = nextBlock;
 		}
 	}
 
 	if (inFrontBlock != nullptr && inFrontBlock->canPassThrough()) {
 		character->moveCharacter(time);
 	}
+
+	// continue until you reach center of block
 	else if (inFrontBlock != nullptr) {
-		if (!blockCenterReached(difference, currentDir))
+		if (!blockCenterReached(difference, currDir))
 			character->moveCharacter(time);
 	}
+	
 }
 
-Block* Labyrinth::getBlock(Vector3 position) {
+//void Labyrinth::moveCharacter(Character* character, Real time) {
+//	// Get the block where the character is placed
+//	Block* currentBlock = getBlock(character->getPosition());
+//
+//	if (currentBlock == nullptr)
+//		return;
+//
+//	Vector3 currentDir = character->getGridOrientation();
+//
+//	Block* inFrontBlock = getBlock(character->getPosition() + currentDir * BLOCK_SIZE);
+//
+//	Vector3 newPos = currentDir * character->getSpeed() * time + character->getPosition();
+//
+//	Vector3 difference = newPos - currentBlock->getPosition();
+//
+//	// trying to change position
+//	if (character->isDirectionModified()) {
+//		Block* nextBlock = getBlock(character->getPosition() + character->getNextDirVector() * BLOCK_SIZE);
+//
+//		// if we've reached the center, see if new direction is valid
+//		if (blockCenterReached(difference, currentDir)) {
+//			if (nextBlock != nullptr && nextBlock->canPassThrough()) {
+//				character->rotateToNewDirection();
+//				return;
+//			}
+//
+//			if (character->is180Turn()) {
+//				character->rotateToNewDirection();
+//				return;
+//			}
+//		}
+//	}
+//
+//	if (inFrontBlock != nullptr && inFrontBlock->canPassThrough()) {
+//		character->moveCharacter(time);
+//	}
+//
+//	else if (inFrontBlock != nullptr) {
+//		if (!blockCenterReached(difference, currentDir))
+//			character->moveCharacter(time);
+//	}
+//}
+
+Block* Labyrinth::getBlock(Vector3 position) const {
 	Vector3 relative = position - _labyrinthOrigin;
 
 	int col = static_cast<int>(
@@ -193,7 +240,7 @@ Block* Labyrinth::getBlock(Vector3 position) {
 }
 
 bool Labyrinth::blockCenterReached(Vector3 difference, Vector3 direction) {
-	const Real tolerance = 0.1f;
+	const Real tolerance = 0.01f;
 
 	if (direction.x > 0)
 		return difference.x >= -tolerance;
