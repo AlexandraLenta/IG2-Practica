@@ -24,6 +24,18 @@ void Character::setLife(int l) {
     _life = l;
 }
 
+void Character::setNewDir(Vector2 dir) {
+    if (dir == Vector2::UNIT_X)
+        _direction = RIGHT;
+    else if (dir == Vector2::UNIT_Y)
+        _direction = DOWN;
+    else if (dir == Vector2::NEGATIVE_UNIT_X)
+        _direction = LEFT;
+    else if (dir == Vector2::NEGATIVE_UNIT_Y)
+        _direction = UP;
+    else
+        throw "Invalid direction.";
+}
 
 Vector3 Character::getNextDirVector() {
     Vector3 newDirVector = Vector3::ZERO;

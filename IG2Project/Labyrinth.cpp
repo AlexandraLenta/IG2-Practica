@@ -143,13 +143,21 @@ void Labyrinth::moveCharacter(Character* character, Real time) {
 
 	Vector3 newPos = currDir * character->getSpeed() * time + character->getPosition();
 
-	Vector3 difference = newPos - currBlock->getPosition();
-
 	Block* inFrontBlock = getBlock(character->getPosition() + currDir * BLOCK_SIZE);
 
+	Real step = character->getSpeed() * time;
+
+	Real before = (character->getPosition() - currBlock->getPosition()).dotProduct(currDir);
+	Real after = before + step;
+
+	if (character->is180Turn()) {
+		character->rotateToNewDirection();
+	}
+
 	// if we reach or pass the center of the current block in this frame
-	if (blockCenterReached(difference, currDir)) {
-		std::cout << "block center reached\n";
+	if (blockCenterReached(before, after)) {
+		character->setPosition({ currBlock->getPosition().x, character->getPosition().y, currBlock->getPosition().z });
+
 		Vector3 newDir = character->chooseDirection(*this);
 
 		Block* nextBlock = getBlock(character->getPosition() + newDir * BLOCK_SIZE);
@@ -158,67 +166,16 @@ void Labyrinth::moveCharacter(Character* character, Real time) {
 			character->rotateToNewDirection();
 			inFrontBlock = nextBlock;
 		}
-			
-		if (character->is180Turn()) {
-			character->rotateToNewDirection();
-			inFrontBlock = nextBlock;
+
+		if (inFrontBlock != nullptr && inFrontBlock->canPassThrough() && character->getSpeed() > 0) {
+			character->moveCharacter(after / character->getSpeed());   // move leftover distance
 		}
+		// else: blocked, stay in block until next frame
+		return;
 	}
 
-	if (inFrontBlock != nullptr && inFrontBlock->canPassThrough()) {
-		character->moveCharacter(time);
-	}
-
-	// continue until you reach center of block
-	else if (inFrontBlock != nullptr) {
-		if (!blockCenterReached(difference, currDir))
-			character->moveCharacter(time);
-	}
-	
+	character->moveCharacter(time); // not in center so just move
 }
-
-//void Labyrinth::moveCharacter(Character* character, Real time) {
-//	// Get the block where the character is placed
-//	Block* currentBlock = getBlock(character->getPosition());
-//
-//	if (currentBlock == nullptr)
-//		return;
-//
-//	Vector3 currentDir = character->getGridOrientation();
-//
-//	Block* inFrontBlock = getBlock(character->getPosition() + currentDir * BLOCK_SIZE);
-//
-//	Vector3 newPos = currentDir * character->getSpeed() * time + character->getPosition();
-//
-//	Vector3 difference = newPos - currentBlock->getPosition();
-//
-//	// trying to change position
-//	if (character->isDirectionModified()) {
-//		Block* nextBlock = getBlock(character->getPosition() + character->getNextDirVector() * BLOCK_SIZE);
-//
-//		// if we've reached the center, see if new direction is valid
-//		if (blockCenterReached(difference, currentDir)) {
-//			if (nextBlock != nullptr && nextBlock->canPassThrough()) {
-//				character->rotateToNewDirection();
-//				return;
-//			}
-//
-//			if (character->is180Turn()) {
-//				character->rotateToNewDirection();
-//				return;
-//			}
-//		}
-//	}
-//
-//	if (inFrontBlock != nullptr && inFrontBlock->canPassThrough()) {
-//		character->moveCharacter(time);
-//	}
-//
-//	else if (inFrontBlock != nullptr) {
-//		if (!blockCenterReached(difference, currentDir))
-//			character->moveCharacter(time);
-//	}
-//}
 
 Block* Labyrinth::getBlock(Vector3 position) const {
 	Vector3 relative = position - _labyrinthOrigin;
@@ -239,22 +196,27 @@ Block* Labyrinth::getBlock(Vector3 position) const {
 	return _blocks[row][col];
 }
 
-bool Labyrinth::blockCenterReached(Vector3 difference, Vector3 direction) {
-	const Real tolerance = 0.01f;
+Block* Labyrinth::getBlock(Vector2 position) const {
+	Vector2 relative = position - Vector2{ _labyrinthOrigin.x, _labyrinthOrigin.z} ;
 
-	if (direction.x > 0)
-		return difference.x >= -tolerance;
+	int col = static_cast<int>(
+		std::round(relative.x / BLOCK_SIZE)
+		);
 
-	if (direction.x < 0)
-		return difference.x <= tolerance;
+	int row = static_cast<int>(
+		std::round(relative.y / BLOCK_SIZE)
+		);
 
-	if (direction.z > 0)
-		return difference.z >= -tolerance;
+	if (row < 0 || row >= _numRows ||
+		col < 0 || col >= _numCols) {
+		return nullptr;
+	}
 
-	if (direction.z < 0)
-		return difference.z <= tolerance;
+	return _blocks[row][col];
+}
 
-	return false;
+bool Labyrinth::blockCenterReached(Real before, Real after) {
+	return before <= 0 && after >= 0;
 }
 
 void Labyrinth::updateLabyrinth(Real time) {

@@ -32,6 +32,10 @@ void SpecialVillain::update(Real dt) {
     _head->setPosition(_headBasePos + Ogre::Vector3(0, 5.f * std::sin(t * 6.f), 0));
 }
 
+Ogre::Vector3 SpecialVillain::chooseDirection(const Labyrinth& l) {
+    return { 0, 0, 0 };
+}
+
 void SpecialVillain::setup() {
     // BODY --------------------------
     entity = mSM->createEntity(BODY_MESH); 

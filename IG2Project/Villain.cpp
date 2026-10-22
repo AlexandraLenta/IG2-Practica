@@ -5,7 +5,3 @@ Villain::Villain(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, float
 void Villain::update(Real time) {
 	// TODO: update logic
 }
-
-Vector3 Villain::chooseDirection(const Labyrinth& l) {
-	return Vector3::UNIT_X;
-}

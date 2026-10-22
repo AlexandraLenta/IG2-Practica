@@ -27,6 +27,8 @@ public:
         _direction = dir;
     }
 
+    void setNewDir(Vector2 dir);
+
     Ogre::Vector3 getNextDirVector();
     bool isDirectionModified();
     Ogre::Quaternion getQuaternionForNewDirection();

@@ -58,6 +58,8 @@ public:
     /// <returns>Pointer to the block object in given position.</returns>
     Block* getBlock(Vector3 position) const;
 
+    Block* getBlock(Vector2 position) const;
+
 private:
     int _numRows, _numCols; 
     Vector3 _labyrinthOrigin;
@@ -88,5 +90,5 @@ private:
     /// <param name="difference">The difference between the center of the block and the character's position.</param>
     /// <param name="direction">The direction in which the player is heading.</param>
     /// <returns></returns>
-    bool blockCenterReached(Vector3 difference, Vector3 direction);
+    bool blockCenterReached(Real before, Real after);
 };

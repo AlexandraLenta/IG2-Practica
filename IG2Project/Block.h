@@ -27,7 +27,7 @@ public:
      */
     Block(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh);
 
-    bool canPassThrough();
+    bool canPassThrough() const;
 
     virtual void update(Real time);
 

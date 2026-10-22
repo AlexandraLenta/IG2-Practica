@@ -11,7 +11,7 @@ public:
 
     void update(Real time) override;
 
-    Vector3 chooseDirection(const Labyrinth& l) override;
+    Vector3 chooseDirection(const Labyrinth& l) = 0;
 
 protected:
     virtual void setup() = 0;
