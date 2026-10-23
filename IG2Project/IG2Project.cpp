@@ -122,6 +122,25 @@ void IG2Project::createLights() {
     mLightNode->setDirection(Ogre::Vector3(-1, -1, -1));
 }
 
+void IG2Project::createMap() {
+    std::ifstream file;
+    file.open(MAP_NAME);
+
+    if (!file) {
+        throw "File not found" + MAP_NAME;
+    }
+
+    int rows, cols;
+    std::string wallMaterial;
+
+    file >> rows >> cols >> wallMaterial >> _floorMaterial;
+    std::cout << wallMaterial << ' ' << _floorMaterial << '\n';
+
+    _labyrinth = new Labyrinth({ 0, 0, 0 }, mSM->getRootSceneNode()->createChildSceneNode("labyrinth"), mSM, rows, cols, wallMaterial, file, this);
+
+    file.close();
+}
+
 void IG2Project::createFloor() {
     std::pair<int, int> size = _labyrinth->getLabyrinthSize();
 
@@ -131,24 +150,12 @@ void IG2Project::createFloor() {
         Vector3::UNIT_Z);
 
     Entity* entFloor = mSM->createEntity("floor", "floor");
-    entFloor->setMaterialName("example/grassFloor");
+    entFloor->setMaterialName(_floorMaterial);
     SceneNode* floorNode = mSM->getRootSceneNode()->createChildSceneNode();
     floorNode->attachObject(entFloor);
     floorNode->translate({ -_labyrinth->BLOCK_SIZE / 2.f, 0, -_labyrinth->BLOCK_SIZE / 2.f });
 }
 
-void IG2Project::createMap() {
-    std::ifstream file;
-    file.open(MAP_NAME);
-
-    if (!file) {
-        throw "File not found" + MAP_NAME;
-    }
-
-    _labyrinth = new Labyrinth({ 0, 0, 0 }, mSM->getRootSceneNode()->createChildSceneNode("labyrinth"), mSM, file, this);
-
-    file.close();
-}
 
 Character* IG2Project::createPlayer(Vector3 position) {
     _player = new Player(position, mSM->getRootSceneNode()->createChildSceneNode("player"), mSM, "Sinbad.mesh");

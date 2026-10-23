@@ -42,7 +42,7 @@ public:
      * @param sceneMng Scene manager.
      * @param fileName File with labyrinth configuration
      */
-    Labyrinth(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, std::istream& input, IG2Project* ig2);
+    Labyrinth(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, int rows, int cols, std::string wallMaterial, std::istream& input, IG2Project* ig2);
 
     ~Labyrinth();
 
@@ -77,6 +77,7 @@ public:
 private:
     IG2Project* _ig2 = nullptr;
     int _numRows, _numCols; 
+    std::string _wallMaterial;
     
     Vector3 _labyrinthOrigin;
 

@@ -59,6 +59,7 @@ protected:
     Ogre::SceneNode* mCamNode = nullptr;
     OgreBites::CameraMan* mCamMgr = nullptr;
 
+    std::string _floorMaterial;
 
 private:
     void createOverlay();

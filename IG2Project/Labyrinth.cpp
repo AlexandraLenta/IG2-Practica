@@ -12,7 +12,7 @@
 Labyrinth::Labyrinth() : IG2Object() {
 }
 
-Labyrinth::Labyrinth(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, std::istream& input, IG2Project* ig2) : IG2Object(initPos, node, sceneMng), _ig2(ig2) {	
+Labyrinth::Labyrinth(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, int rows, int cols, std::string wallMaterial, std::istream& input, IG2Project* ig2) : IG2Object(initPos, node, sceneMng), _ig2(ig2), _numRows(rows), _numCols(cols), _wallMaterial(wallMaterial) {
 	createLabyrinth(input, ig2);
 }
 
@@ -37,8 +37,6 @@ Character* Labyrinth::getPlayer() const {
 void Labyrinth::createLabyrinth(std::istream& input, IG2Project* ig2) {
 	int iRow = 0, iCol = 0;
 	char cell;
-
-	input >> _numRows >> _numCols;
 
 	_blocks = std::vector<std::vector<Block*>>(_numRows, std::vector<Block*>(_numCols));
 
@@ -137,7 +135,11 @@ Block* Labyrinth::createBlock(Vector3 pos, BlockType type) {
 	}
 
 	blockObj->setScale(getCubeResizeScale(blockObj));
-
+	
+	if (blockObj->hasEntity()) {
+		blockObj->setMaterialName(_wallMaterial);
+		std::cout << "HAS ENTITY!\n";
+	}
 	return blockObj;
 }
 
@@ -295,5 +297,5 @@ std::pair<int, int> Labyrinth::getBlockRowColFromPos(Vector2 position) const {
 
 
 std::pair<int, int> Labyrinth::getLabyrinthSize() {
-	return { _blocks[0].size() * BLOCK_SIZE, _blocks.size() * BLOCK_SIZE };
+	return { _numCols * BLOCK_SIZE, _numRows * BLOCK_SIZE };
 }
