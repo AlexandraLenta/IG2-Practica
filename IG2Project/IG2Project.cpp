@@ -80,8 +80,8 @@ void IG2Project::setupScene(void) {
 
     createCamera();
     createLights();
-    createFloor();
     createMap();
+    createFloor();
 }
 
 void IG2Project::createCamera() {
@@ -118,15 +118,18 @@ void IG2Project::createLights() {
 }
 
 void IG2Project::createFloor() {
+    std::pair<int, int> size = _labyrinth->getLabyrinthSize();
+
     MeshManager::getSingleton().createPlane("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
         Plane(Vector3::UNIT_Y, 0),
-        1500, 1500, 50, 50, true, 1, 5, 5,
+        size.first, size.second, 50, 50, true, 1, 5, 5,
         Vector3::UNIT_Z);
 
     Entity* entFloor = mSM->createEntity("exampleFloor", "floor");
     entFloor->setMaterialName("example/stonesFloor");
     SceneNode* floorNode = mSM->getRootSceneNode()->createChildSceneNode();
     floorNode->attachObject(entFloor);
+    floorNode->translate({ -_labyrinth->BLOCK_SIZE / 2.f, 0, -_labyrinth->BLOCK_SIZE / 2.f });
 }
 
 void IG2Project::createMap() {
@@ -137,13 +140,13 @@ void IG2Project::createMap() {
         throw "File not found" + MAP_NAME;
     }
 
-    _labyrinth = new Labyrinth({ 0, Labyrinth::BLOCK_SIZE/2., 0 }, mSM->getRootSceneNode()->createChildSceneNode("labyrinth"), mSM, file, this);
+    _labyrinth = new Labyrinth({ 0, 0, 0 }, mSM->getRootSceneNode()->createChildSceneNode("labyrinth"), mSM, file, this);
 
     file.close();
 }
 
 Character* IG2Project::createPlayer(Vector3 position) {
-    _player = new Player(position, mSM->getRootSceneNode()->createChildSceneNode("player"), mSM, "Barrel.mesh");
+    _player = new Player(position, mSM->getRootSceneNode()->createChildSceneNode("player"), mSM, "Sinbad.mesh");
     _player->setInitialPosition({ _player->getPosition().x, _player->getPosition().y + _player->calculateBoxSize().y / 2.f, _player->getPosition().z });
     _player->setPosition(_player->getInitialPosition());
 

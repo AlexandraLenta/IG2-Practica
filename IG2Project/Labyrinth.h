@@ -49,6 +49,8 @@ public:
     void updateLabyrinth(Real time);
     void moveCharacter(Character* character, Real time);
 
+    std::pair<int, int> getLabyrinthSize();
+
     Character* getPlayer() const;
 
     /// <summary>
