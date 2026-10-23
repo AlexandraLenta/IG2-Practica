@@ -14,6 +14,6 @@ void Player::setPoints(int p) {
     _points = p;
 }
 
-Vector3 Player::chooseDirection(const Labyrinth& l) {
+Vector3 Player::chooseDirection() {
     return getNextDirVector();
 }

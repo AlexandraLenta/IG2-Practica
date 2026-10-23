@@ -24,6 +24,10 @@ void Character::setLife(int l) {
     _life = l;
 }
 
+void Character::hurt() {
+    _life--;
+}
+
 void Character::setNewDir(Vector2 dir) {
     if (dir == Vector2::UNIT_X)
         _direction = RIGHT;

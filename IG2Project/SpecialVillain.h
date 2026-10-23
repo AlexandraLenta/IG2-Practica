@@ -12,7 +12,7 @@ public:
 	~SpecialVillain();
 
 	void update(Real dt) override;
-	Ogre::Vector3 chooseDirection(const Labyrinth& l) override;
+	Ogre::Vector3 chooseDirection() override;
 
 protected:
 	const std::string BODY_MESH = "cube.mesh";

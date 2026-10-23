@@ -73,10 +73,21 @@ public:
     std::pair<int, int> getBlockRowColFromPos(Vector2 position) const;
 
 private:
+    IG2Project* _ig2 = nullptr;
     int _numRows, _numCols; 
+    
     Vector3 _labyrinthOrigin;
+
     std::vector<std::vector<Block*>> _blocks;
+    
+    /// <summary>
+    /// Holds pointers to ALL characters (player(s) included)
+    /// </summary>
     std::vector<Character*> _characters;
+
+    /// <summary>
+    /// Pointer to the player. To be switched for a vector<Character*> if there are multiple players.
+    /// </summary>
     Character* _player = nullptr;
 
     /// <summary>
@@ -103,4 +114,31 @@ private:
     /// <param name="direction">The direction in which the player is heading.</param>
     /// <returns></returns>
     bool blockCenterReached(Real before, Real after);
+    
+    /// <summary>
+    /// Update all blocks.
+    /// </summary>
+    /// <param name="time">Delta time.</param>
+    void updateBlocks(Real time);
+
+    /// <summary>
+    /// Update all characters.
+    /// </summary>
+    /// <param name="time">Delta time.</param>
+    void moveCharacters(Real time);
+
+    /// <summary>
+    /// Check the collision between all players with all villains.
+    /// </summary>
+    void checkPlayerVillainsCollisions();
+
+    /// <summary>
+    /// What to do in case the player has lost a life and is not dead.
+    /// </summary>
+    void onPlayerHurt();
+
+    /// <summary>
+    /// What to do in case of player death.
+    /// </summary>
+    void onPlayerDeath();
 };

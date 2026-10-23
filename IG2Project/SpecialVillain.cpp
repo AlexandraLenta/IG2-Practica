@@ -36,10 +36,10 @@ void SpecialVillain::update(Real dt) {
     _head->setPosition(_headBasePos + Ogre::Vector3(0, 5.f * std::sin(t * 6.f), 0));
 }
 
-Ogre::Vector3 SpecialVillain::chooseDirection(const Labyrinth& l) {
-    Ogre::Vector2 dir = bfs(l.getBlocks(), 
-        l.getBlockRowColFromPos({ getPosition().x, getPosition().z }), 
-        l.getBlockRowColFromPos({l.getPlayer()->getPosition().x, l.getPlayer()->getPosition().z }));
+Ogre::Vector3 SpecialVillain::chooseDirection() {
+    Ogre::Vector2 dir = bfs(_labyrinth->getBlocks(),
+        _labyrinth->getBlockRowColFromPos({ getPosition().x, getPosition().z }),
+        _labyrinth->getBlockRowColFromPos({ _labyrinth->getPlayer()->getPosition().x, _labyrinth->getPlayer()->getPosition().z }));
 
     if (dir == Ogre::Vector2::ZERO)
         return getGridOrientation();   // on the player, or unreachable: keep going

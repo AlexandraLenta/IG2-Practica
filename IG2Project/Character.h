@@ -23,6 +23,11 @@ public:
     int getLife();
     void setLife(int l);
 
+    /// <summary>
+    /// Removes 1 from the character's life AND calls hurt or death callback.
+    /// </summary>
+    void hurt();
+
     void setNewDir(Directions dir) {
         _direction = dir;
     }
@@ -38,11 +43,17 @@ public:
     void moveCharacter(Real time);
     virtual void update(Real time);
 
-    virtual Ogre::Vector3 chooseDirection(const Labyrinth& l) = 0;
+    void setLabyrinth(Labyrinth* l) {
+        _labyrinth = l;
+    }
+
+    virtual Ogre::Vector3 chooseDirection() = 0;
 
 protected:
     int _life;
     float _speed;
 
     Directions _direction = DOWN;
+
+    Labyrinth* _labyrinth = nullptr;
 };

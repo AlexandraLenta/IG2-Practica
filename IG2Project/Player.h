@@ -9,8 +9,7 @@ public:
     int getPoints();
     void setPoints(int p);
 
-    Ogre::Vector3 chooseDirection(const Labyrinth& l) override;
+    Ogre::Vector3 chooseDirection() override;
 private:
     int _points;
 };
-

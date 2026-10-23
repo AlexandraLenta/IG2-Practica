@@ -6,7 +6,7 @@ class SimpleVillain :
 public:
     SimpleVillain(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, float sp = 10, int l = 3);
 
-    Ogre::Vector3 chooseDirection(const Labyrinth& l) override;
+    Ogre::Vector3 chooseDirection() override;
 private:
     void setup() override;
 };

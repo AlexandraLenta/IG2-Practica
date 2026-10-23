@@ -31,6 +31,8 @@ public:
 
     Character* createPlayer(Ogre::Vector3 position);
 
+    void endGame();
+
 protected:
     virtual bool keyPressed(const OgreBites::KeyboardEvent& evt);
     virtual void frameRendered(const Ogre::FrameEvent& evt);

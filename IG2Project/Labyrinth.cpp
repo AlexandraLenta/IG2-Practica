@@ -11,7 +11,7 @@
 Labyrinth::Labyrinth() : IG2Object() {
 }
 
-Labyrinth::Labyrinth(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, std::istream& input, IG2Project* ig2) : IG2Object(initPos, node, sceneMng) {	
+Labyrinth::Labyrinth(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, std::istream& input, IG2Project* ig2) : IG2Object(initPos, node, sceneMng), _ig2(ig2) {	
 	createLabyrinth(input, ig2);
 }
 
@@ -21,6 +21,12 @@ Labyrinth::~Labyrinth() {
 			delete b;
 
 	_blocks.clear();
+
+	for (auto c : _characters) {
+		delete c;
+	}
+
+	_characters.clear();
 }
 
 Character* Labyrinth::getPlayer() const {
@@ -64,11 +70,12 @@ void Labyrinth::createLabyrinth(std::istream& input, IG2Project* ig2) {
 			else if (cell == HERO) {
 				block = createBlock(nextPos, EMPTY); // donde esta el jugador solo puede haber un bloque vacio
 
-				Vector3 playerPos = _labyrinthOrigin;
-				playerPos.x += iCol * BLOCK_SIZE;
-				playerPos.z += iRow * BLOCK_SIZE;
+				Vector3 pos = _labyrinthOrigin;
+				pos.x += iCol * BLOCK_SIZE;
+				pos.z += iRow * BLOCK_SIZE;
 
-				_player = ig2->createPlayer(playerPos);
+				_player = ig2->createPlayer(pos);
+				_player->setLabyrinth(this);
 				_characters.push_back(_player);
 			}
 			else if (cell == VILLAIN_NORMAL) {
@@ -78,7 +85,9 @@ void Labyrinth::createLabyrinth(std::istream& input, IG2Project* ig2) {
 				villainPos.x += iCol * BLOCK_SIZE;
 				villainPos.z += iRow * BLOCK_SIZE;
 
-				_characters.push_back(new SimpleVillain(villainPos, mSM->getRootSceneNode()->createChildSceneNode(), mSM));
+				Character* villain = new SimpleVillain(villainPos, mSM->getRootSceneNode()->createChildSceneNode(), mSM);
+				villain->setLabyrinth(this);
+				_characters.push_back(villain);
 			}
 			else if (cell == VILLAIN_SPECIAL) {
 				block = createBlock(nextPos, EMPTY); // donde esta el jugador solo puede haber un bloque vacio
@@ -87,7 +96,10 @@ void Labyrinth::createLabyrinth(std::istream& input, IG2Project* ig2) {
 				villainPos.x += iCol * BLOCK_SIZE;
 				villainPos.z += iRow * BLOCK_SIZE;
 
-				_characters.push_back(new SpecialVillain(villainPos, mSM->getRootSceneNode()->createChildSceneNode(), mSM));
+				Character* villain = new SpecialVillain(villainPos, mSM->getRootSceneNode()->createChildSceneNode(), mSM);
+				villain->setLabyrinth(this);
+
+				_characters.push_back(villain);
 			}
 
 			_blocks[iRow][iCol] = block;
@@ -158,7 +170,7 @@ void Labyrinth::moveCharacter(Character* character, Real time) {
 	if (blockCenterReached(before, after)) {
 		character->setPosition({ currBlock->getPosition().x, character->getPosition().y, currBlock->getPosition().z });
 
-		Vector3 newDir = character->chooseDirection(*this);
+		Vector3 newDir = character->chooseDirection();
 
 		Block* nextBlock = getBlock(character->getPosition() + newDir * BLOCK_SIZE);
 		
@@ -207,16 +219,50 @@ bool Labyrinth::blockCenterReached(Real before, Real after) {
 }
 
 void Labyrinth::updateLabyrinth(Real time) {
+	updateBlocks(time);
+
+	moveCharacters(time);
+
+	checkPlayerVillainsCollisions();
+}
+
+void Labyrinth::updateBlocks(Real time) {
 	for (auto rows : _blocks) {
 		for (auto* block : rows) {
 			block->update(time);
 		}
 	}
+}
 
+void Labyrinth::moveCharacters(Real time) {
 	for (auto* ch : _characters) {
 		ch->update(time);
 		moveCharacter(ch, time);
 	}
+}
+
+void Labyrinth::checkPlayerVillainsCollisions() {
+	for (auto* villain : _characters) {
+		if (villain != _player) {
+			if (_player->getAABB().intersects(villain->getAABB())) {
+				_player->hurt();
+				if (_player->getLife() <= 0) {
+					onPlayerDeath();
+				}
+				else {
+					onPlayerHurt();
+				}
+			}
+		}
+	}
+}
+
+void Labyrinth::onPlayerHurt() {
+	_player->setPosition(_player->getInitialPosition());
+}
+
+void Labyrinth::onPlayerDeath() {
+	_ig2->endGame();
 }
 
 std::vector<std::vector<Block*>> Labyrinth::getBlocks() const {

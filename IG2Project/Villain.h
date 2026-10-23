@@ -11,7 +11,7 @@ public:
 
     void update(Real time) override;
 
-    Vector3 chooseDirection(const Labyrinth& l) = 0;
+    virtual Vector3 chooseDirection() = 0;
 
 protected:
     const std::vector<Vector2> _directions = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} };

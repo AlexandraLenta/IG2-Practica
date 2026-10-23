@@ -16,12 +16,12 @@ void SimpleVillain::setup() {
 }
 
 
-Ogre::Vector3 SimpleVillain::chooseDirection(const Labyrinth& l) {
+Ogre::Vector3 SimpleVillain::chooseDirection() {
 	std::vector<Vector2> possibleNextDirs;
 	const Block* b;
 
 	for (int i = 0; i < _directions.size(); i++) {
-		b = l.getBlock(Vector2{ getPosition().x, getPosition().z } + _directions[i] * l.BLOCK_SIZE);
+		b = _labyrinth->getBlock(Vector2{ getPosition().x, getPosition().z } + _directions[i] * _labyrinth->BLOCK_SIZE);
 
 		if (b != nullptr && b->canPassThrough()) {
 			possibleNextDirs.push_back(_directions[i]);

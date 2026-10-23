@@ -41,7 +41,6 @@ bool IG2Project::keyPressed(const OgreBites::KeyboardEvent& evt) {
 
 void IG2Project::shutdown() {
     delete _labyrinth; _labyrinth = nullptr;
-    delete _player; _player = nullptr;
 
     mShaderGenerator->removeSceneManager(mSM);
     mSM->removeRenderQueueListener(mOverlaySystem);
@@ -155,4 +154,8 @@ void IG2Project::frameRendered(const Ogre::FrameEvent& evt) {
     if (_labyrinth != nullptr) {
         _labyrinth->updateLabyrinth(evt.timeSinceLastFrame);
     }
+}
+
+void IG2Project::endGame() {
+    getRoot()->queueEndRendering();
 }
