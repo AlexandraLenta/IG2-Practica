@@ -7,3 +7,13 @@ material example/stonesFloor{
 	}
     }
 }
+
+material example/grassFloor {
+    technique { 
+	pass {  
+	    texture_unit {
+			texture grass.PNG
+	    }
+	}
+    }
+}

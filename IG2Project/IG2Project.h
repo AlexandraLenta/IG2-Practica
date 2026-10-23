@@ -20,6 +20,7 @@ class Player;
 class Labyrinth;
 class Character;
 class SpecialVillain;
+class GameInfoOverlay;
 
 static const std::string MAP_NAME = "../../IG2Project/IG2Project/IG2Media/stage1b.txt";
 
@@ -31,7 +32,10 @@ public:
 
     Character* createPlayer(Ogre::Vector3 position);
 
+    void updateInfo();
     void endGame();
+
+    GameInfoOverlay* getInfoOverlay() const;
 
 protected:
     virtual bool keyPressed(const OgreBites::KeyboardEvent& evt);
@@ -43,6 +47,7 @@ protected:
     Player* _player = nullptr;
     Labyrinth* _labyrinth = nullptr;
     SpecialVillain* _villain = nullptr;
+    GameInfoOverlay* _infoOverlay = nullptr;
 
     Ogre::SceneManager* mSM = nullptr;
     OgreBites::TrayManager* mTrayMgr = nullptr;
@@ -54,7 +59,9 @@ protected:
     Ogre::SceneNode* mCamNode = nullptr;
     OgreBites::CameraMan* mCamMgr = nullptr;
 
+
 private:
+    void createOverlay();
     void createCamera();
     void createLights();
     void createFloor();

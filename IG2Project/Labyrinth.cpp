@@ -7,6 +7,7 @@
 #include "FakeBlock.h"
 #include "SpecialVillain.h"
 #include "SimpleVillain.h"
+#include "GameInfoOverlay.h"
 
 Labyrinth::Labyrinth() : IG2Object() {
 }
@@ -259,10 +260,14 @@ void Labyrinth::checkPlayerVillainsCollisions() {
 
 void Labyrinth::onPlayerHurt() {
 	_player->setPosition(_player->getInitialPosition());
+
+	if (_ig2)
+		_ig2->updateInfo();
 }
 
 void Labyrinth::onPlayerDeath() {
-	_ig2->endGame();
+	if (_ig2)
+		_ig2->endGame();
 }
 
 std::vector<std::vector<Block*>> Labyrinth::getBlocks() const {

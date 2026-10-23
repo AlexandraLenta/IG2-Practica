@@ -24,6 +24,7 @@
     <ClCompile Include="Character.cpp" />
     <ClCompile Include="EmptyBlock.cpp" />
     <ClCompile Include="FakeBlock.cpp" />
+    <ClCompile Include="GameInfoOverlay.cpp" />
     <ClCompile Include="IG2Object.cpp" />
     <ClCompile Include="IG2Project.cpp" />
     <ClCompile Include="InvisibleBlock.cpp" />
@@ -41,6 +42,7 @@
     <ClInclude Include="Character.h" />
     <ClInclude Include="EmptyBlock.h" />
     <ClInclude Include="FakeBlock.h" />
+    <ClInclude Include="GameInfoOverlay.h" />
     <ClInclude Include="IG2Object.h" />
     <ClInclude Include="IG2Project.h" />
     <ClInclude Include="InvisibleBlock.h" />

@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "SpecialVillain.h"
 #include <fstream>
+#include "GameInfoOverlay.h"
 
 using namespace Ogre;
 
@@ -49,6 +50,7 @@ void IG2Project::shutdown() {
 
     delete mTrayMgr;  mTrayMgr = nullptr;
     delete mCamMgr; mCamMgr = nullptr;
+    delete _infoOverlay; _infoOverlay = nullptr;
 
     // do not forget to call the base 
     OgreBites::ApplicationContext::shutdown();
@@ -77,11 +79,14 @@ void IG2Project::setup(void) {
 }
 
 void IG2Project::setupScene(void) {
-
+    createOverlay();
     createCamera();
     createLights();
     createMap();
     createFloor();
+
+    _infoOverlay->setPlayer(_player);
+    _infoOverlay->updateGameInfo();
 }
 
 void IG2Project::createCamera() {
@@ -125,8 +130,8 @@ void IG2Project::createFloor() {
         size.first, size.second, 50, 50, true, 1, 5, 5,
         Vector3::UNIT_Z);
 
-    Entity* entFloor = mSM->createEntity("exampleFloor", "floor");
-    entFloor->setMaterialName("example/stonesFloor");
+    Entity* entFloor = mSM->createEntity("floor", "floor");
+    entFloor->setMaterialName("example/grassFloor");
     SceneNode* floorNode = mSM->getRootSceneNode()->createChildSceneNode();
     floorNode->attachObject(entFloor);
     floorNode->translate({ -_labyrinth->BLOCK_SIZE / 2.f, 0, -_labyrinth->BLOCK_SIZE / 2.f });
@@ -153,12 +158,26 @@ Character* IG2Project::createPlayer(Vector3 position) {
     return _player;
 }
 
+void IG2Project::createOverlay() {
+    Real width = getRenderWindow()->getWidth() / 4.f;
+
+    _infoOverlay = new GameInfoOverlay(mTrayMgr, width);
+}
+
 void IG2Project::frameRendered(const Ogre::FrameEvent& evt) {
     if (_labyrinth != nullptr) {
         _labyrinth->updateLabyrinth(evt.timeSinceLastFrame);
     }
 }
 
+void IG2Project::updateInfo() {
+    _infoOverlay->updateGameInfo();
+}
+
 void IG2Project::endGame() {
     getRoot()->queueEndRendering();
+}
+
+GameInfoOverlay* IG2Project::getInfoOverlay() const {
+    return _infoOverlay;
 }
