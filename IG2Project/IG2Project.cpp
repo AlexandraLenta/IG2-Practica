@@ -108,6 +108,9 @@ void IG2Project::createCamera() {
 
 void IG2Project::createLights() {
     mSM->setAmbientLight(ColourValue(0.2, 0.2, 0.2));
+
+    auto* vp = getRenderWindow()->getViewport(0);   // or wherever you add your viewport
+    vp->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 }
 
 void IG2Project::createMap() {

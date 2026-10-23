@@ -47,7 +47,7 @@ void Labyrinth::createLight(std::string type) {
 		_light->setType(Light::LightTypes::LT_POINT);
 		_lightNode->setDirection(Ogre::Vector3(0, -1, 0));
 		_lightNode->setPosition(_lightNode->getPosition().x, POINT_LIGHT_HEIGHT, _lightNode->getPosition().z);
-		_light->setAttenuation(LIGHT_RANGE, 1.0f, 0.0f, 0.001f);
+		_light->setAttenuation(LIGHT_RANGE, 1.0f, 0.0f, 0.00001f);
 	}
 	else if (type == SPOT_LIGHT) {
 		_light->setType(Light::LightTypes::LT_SPOTLIGHT);

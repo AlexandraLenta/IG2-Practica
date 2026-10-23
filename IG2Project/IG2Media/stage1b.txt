@@ -2,7 +2,7 @@
 19
 game/stonesFloor
 game/grassFloor
-spot
+point
 ixxxxxxxxxxxxxxxxxx
 xooohooooboooooooox
 xoxxoxxxoxoxxxoxxox
