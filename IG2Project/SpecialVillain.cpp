@@ -94,6 +94,8 @@ void SpecialVillain::setup() {
     this->setPosition(initialPosition);
     mNode->setScale(0.15, 0.1, 0.15);
 
+    entity->setMaterialName(BODY_MATERIAL);
+
     Vector3 bodySize = calculateNodeBoxSize(mNode);
 
     Real halfH = bodySize.y / 2.0f;
@@ -101,7 +103,7 @@ void SpecialVillain::setup() {
     mNode->setPosition(initialPosition.x, initialPosition.y + halfH/7.f, initialPosition.z);
 
     // TOP ----------------------------
-    _top = createPart(mNode, TOP_MESH, TOP_SCALE);
+    _top = createPart(mNode, TOP_MESH, TOP_SCALE, TOP_MATERIAL);
 
     Vector3 topSize = calculateNodeBoxSize(_top);
 
@@ -138,9 +140,15 @@ void SpecialVillain::setup() {
     _wheelsSign.push_back({ createWheel(4, false, false), 1 });  // back right
 }
 
-Ogre::SceneNode* SpecialVillain::createPart(Ogre::SceneNode* parent, const std::string& mesh, const Vector3& scale) {
+Ogre::SceneNode* SpecialVillain::createPart(Ogre::SceneNode* parent, const std::string& mesh, const Vector3& scale, std::string materialName) {
     Ogre::SceneNode* node = parent->createChildSceneNode();
-    node->attachObject(mSM->createEntity(mesh));
+    Ogre::Entity* ent = mSM->createEntity(mesh);
+    node->attachObject(ent);
+    
+    if (!materialName.empty()) {
+        ent->setMaterialName(materialName);
+    }
+
     node->setScale(scale);
     return node;
 }

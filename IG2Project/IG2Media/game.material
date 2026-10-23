@@ -1,0 +1,39 @@
+material game/stonesFloor{
+    technique { 
+	pass {  
+	    texture_unit {
+		texture BeachStones.jpg
+	    }
+	}
+    }
+}
+
+material game/grassFloor {
+    technique { 
+	pass {  
+	    texture_unit {
+			texture grass.jpg
+	    }
+	}
+    }
+}
+
+material game/tankBody {
+    technique { 
+	pass {  
+	    texture_unit {
+			texture tank.jpg
+	    }
+	}
+    }
+}
+
+material game/tankTop {
+    technique { 
+	pass {  
+	    texture_unit {
+			texture tankTop.jpg
+	    }
+	}
+    }
+}

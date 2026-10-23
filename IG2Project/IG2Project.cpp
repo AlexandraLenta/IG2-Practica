@@ -20,19 +20,15 @@ bool IG2Project::keyPressed(const OgreBites::KeyboardEvent& evt) {
     }
 
     else if (evt.keysym.sym == SDLK_UP || evt.keysym.sym == SDLK_w) {
-        std::cout << "Pressed UP" << std::endl;
         _player->setNewDir(Player::UP);
     }
     else if (evt.keysym.sym == SDLK_DOWN || evt.keysym.sym == SDLK_s) {
-        std::cout << "Pressed DOWN" << std::endl;
         _player->setNewDir(Player::DOWN);
     }
     else if (evt.keysym.sym == SDLK_LEFT || evt.keysym.sym == SDLK_a) {
-        std::cout << "Pressed LEFT" << std::endl;
         _player->setNewDir(Player::LEFT);
     }
     else if (evt.keysym.sym == SDLK_RIGHT || evt.keysym.sym == SDLK_d) {
-        std::cout << "Pressed RIGHT" << std::endl;
         _player->setNewDir(Player::RIGHT);
     }
 

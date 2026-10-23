@@ -1,7 +1,7 @@
 19
 19
-example/stonesFloor
-example/grassFloor
+game/stonesFloor
+game/grassFloor
 ixxxxxxxxxxxxxxxxxx
 xooohooooboooooooox
 xoxxoxxxoxoxxxoxxox

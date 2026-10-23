@@ -15,6 +15,7 @@ public:
 	Ogre::Vector3 chooseDirection() override;
 
 protected:
+	// MESHES -----------------------------------------
 	const std::string BODY_MESH = "cube.mesh";
 	const std::string TOP_MESH = "sphere.mesh";
 	const std::string HEAD_MESH = "DamagedHelmet.mesh";
@@ -22,6 +23,11 @@ protected:
 	const std::string WHEEL_MESH = "Barrel.mesh";
 	const std::string WHEEL_DECO_MESH = "ogrehead.mesh";
 	const std::string WHEEL_DECO2_MESH = "Sword.mesh";
+
+	// MATERIALS --------------------------------------
+	const std::string BODY_MATERIAL = "game/tankBody";
+	const std::string TOP_MATERIAL = "game/tankTop";
+
 	const Vector3 TOP_SCALE = { 0.2, 0.15, 0.2 };
 	const Vector3 HEAD_SCALE = { 60, 120, 60 };
 	Vector3 GUN_SCALE = { 40, 30, 20 };
@@ -37,7 +43,7 @@ protected:
 
 	void setup() override; 
 	Ogre::SceneNode* createWheel(int id, bool left, bool front);
-	Ogre::SceneNode* createPart(Ogre::SceneNode* parent, const std::string& mesh, const Vector3& scale);
+	Ogre::SceneNode* createPart(Ogre::SceneNode* parent, const std::string& mesh, const Vector3& scale, std::string materialName = "");
 
 	Vector3 calculateNodeBoxSize(Ogre::SceneNode* node);
 

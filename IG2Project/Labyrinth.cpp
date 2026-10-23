@@ -138,7 +138,6 @@ Block* Labyrinth::createBlock(Vector3 pos, BlockType type) {
 	
 	if (blockObj->hasEntity()) {
 		blockObj->setMaterialName(_wallMaterial);
-		std::cout << "HAS ENTITY!\n";
 	}
 	return blockObj;
 }
