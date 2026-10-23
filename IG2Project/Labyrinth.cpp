@@ -34,9 +34,40 @@ Character* Labyrinth::getPlayer() const {
 	return _player;
 }
 
+void Labyrinth::createLight(std::string type) {
+	_light = mSM->createLight("labyrinthLight");
+	_light->setDiffuseColour(0.75, 0.75, 0.75);
+
+	_lightNode = _player->createChildSceneNode();
+	_lightNode->attachObject(_light);
+
+	//mSM->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_STENCIL_MODULATIVE); // more beautiful shadows, laggy
+
+	if (type == POINT_LIGHT) {
+		_light->setType(Light::LightTypes::LT_POINT);
+		_lightNode->setDirection(Ogre::Vector3(0, -1, 0));
+		_lightNode->setPosition(_lightNode->getPosition().x, POINT_LIGHT_HEIGHT, _lightNode->getPosition().z);
+		_light->setAttenuation(LIGHT_RANGE, 1.0f, 0.0f, 0.001f);
+	}
+	else if (type == SPOT_LIGHT) {
+		_light->setType(Light::LightTypes::LT_SPOTLIGHT);
+		_lightNode->setDirection(Ogre::Vector3(0, -1, 0));
+		_lightNode->setPosition(_lightNode->getPosition().x, SPOT_LIGHT_HEIGHT, _lightNode->getPosition().z);
+		_light->setSpotlightRange(Degree(25), Degree(45), 1.0f); // inner, outer, falloff
+		_light->setAttenuation(SPOT_LIGHT_HEIGHT * 3, 1.0f, 0.0f, 0.0f);
+	}
+	else {
+		_light->setType(Light::LightTypes::LT_DIRECTIONAL);
+		_lightNode->setDirection(Ogre::Vector3(0, -1, -1));
+	}
+}
+
 void Labyrinth::createLabyrinth(std::istream& input, IG2Project* ig2) {
 	int iRow = 0, iCol = 0;
 	char cell;
+
+	std::string lightType;
+	input >> lightType;
 
 	_blocks = std::vector<std::vector<Block*>>(_numRows, std::vector<Block*>(_numCols));
 
@@ -75,7 +106,9 @@ void Labyrinth::createLabyrinth(std::istream& input, IG2Project* ig2) {
 
 				_player = ig2->createPlayer(pos);
 				_player->setLabyrinth(this);
+
 				_characters.push_back(_player);
+				createLight(lightType);
 			}
 			else if (cell == VILLAIN_NORMAL) {
 				block = createBlock(nextPos, EMPTY); // donde esta el jugador solo puede haber un bloque vacio

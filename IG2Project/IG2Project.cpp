@@ -107,15 +107,7 @@ void IG2Project::createCamera() {
 }
 
 void IG2Project::createLights() {
-    mSM->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
-
-    Light* luz = mSM->createLight("Luz");
-    luz->setType(Ogre::Light::LT_DIRECTIONAL);
-    luz->setDiffuseColour(0.75, 0.75, 0.75);
-
-    mLightNode = mSM->getRootSceneNode()->createChildSceneNode("nLuz");
-    mLightNode->attachObject(luz);
-    mLightNode->setDirection(Ogre::Vector3(-1, -1, -1));
+    mSM->setAmbientLight(ColourValue(0.2, 0.2, 0.2));
 }
 
 void IG2Project::createMap() {
@@ -130,7 +122,6 @@ void IG2Project::createMap() {
     std::string wallMaterial;
 
     file >> rows >> cols >> wallMaterial >> _floorMaterial;
-    std::cout << wallMaterial << ' ' << _floorMaterial << '\n';
 
     _labyrinth = new Labyrinth({ 0, 0, 0 }, mSM->getRootSceneNode()->createChildSceneNode("labyrinth"), mSM, rows, cols, wallMaterial, file, this);
 

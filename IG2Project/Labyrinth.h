@@ -20,7 +20,15 @@ public:
     static constexpr char HERO = 'h';
     static constexpr char VILLAIN_NORMAL = 'v';
     static constexpr char VILLAIN_SPECIAL = 'V';
+
+    static constexpr std::string_view DIRECTIONAL_LIGHT = "directional";
+    static constexpr std::string_view POINT_LIGHT = "point";
+    static constexpr std::string_view SPOT_LIGHT = "spot";
+    
     static constexpr float BLOCK_SIZE = 15; 
+    static constexpr float POINT_LIGHT_HEIGHT = 5;
+    static constexpr float SPOT_LIGHT_HEIGHT = 80;
+    static constexpr float LIGHT_RANGE = 800;
 
     enum BlockType {
         EMPTY,
@@ -79,6 +87,9 @@ private:
     int _numRows, _numCols; 
     std::string _wallMaterial;
     
+    /// <summary>
+    /// Position of the center of the labyrinth in world coordinates.
+    /// </summary>
     Vector3 _labyrinthOrigin;
 
     std::vector<std::vector<Block*>> _blocks;
@@ -92,6 +103,14 @@ private:
     /// Pointer to the player. To be switched for a vector<Character*> if there are multiple players.
     /// </summary>
     Character* _player = nullptr;
+
+    Light* _light = nullptr;
+    Ogre::SceneNode* _lightNode = nullptr;
+
+    /// <summary>
+    /// Creates the light for the scene based on the input.
+    /// </summary>
+    void createLight(std::string type);
 
     /// <summary>
     /// Creates the labyrinth structure.
@@ -123,6 +142,8 @@ private:
     /// </summary>
     /// <param name="time">Delta time.</param>
     void updateBlocks(Real time);
+
+    void updateLight();
 
     /// <summary>
     /// Update all characters.
