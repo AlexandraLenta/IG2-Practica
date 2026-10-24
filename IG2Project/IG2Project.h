@@ -61,7 +61,7 @@ private:
     void createOverlay();
     void createCamera();
     void createLights();
-    void createFloor();
+    void createEnvironment();
     void createMap();
 };
 

@@ -79,7 +79,7 @@ void IG2Project::setupScene(void) {
     createCamera();
     createLights();
     createMap();
-    createFloor();
+    createEnvironment();
 
     _infoOverlay->setPlayer(_player);
     _infoOverlay->updateGameInfo();
@@ -109,7 +109,7 @@ void IG2Project::createCamera() {
 void IG2Project::createLights() {
     mSM->setAmbientLight(ColourValue(0.2, 0.2, 0.2));
 
-    auto* vp = getRenderWindow()->getViewport(0);   // or wherever you add your viewport
+    auto* vp = getRenderWindow()->getViewport(0);
     vp->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 }
 
@@ -131,7 +131,8 @@ void IG2Project::createMap() {
     file.close();
 }
 
-void IG2Project::createFloor() {
+void IG2Project::createEnvironment() {
+    // FLOOR
     std::pair<int, int> size = _labyrinth->getLabyrinthSize();
 
     MeshManager::getSingleton().createPlane("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
@@ -144,6 +145,12 @@ void IG2Project::createFloor() {
     SceneNode* floorNode = mSM->getRootSceneNode()->createChildSceneNode();
     floorNode->attachObject(entFloor);
     floorNode->translate({ -_labyrinth->BLOCK_SIZE / 2.f, 0, -_labyrinth->BLOCK_SIZE / 2.f });
+
+    // SKY
+    Ogre::Plane skyPlane;
+    skyPlane.d = 1000;
+    skyPlane.normal = Ogre::Vector3::UNIT_Y;
+    mSM->setSkyPlane(true, skyPlane, "game/sky", 1500, 50, true, 1.5, 50, 50);
 }
 
 

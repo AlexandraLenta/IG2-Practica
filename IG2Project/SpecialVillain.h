@@ -8,11 +8,17 @@ class SpecialVillain :
 	public Villain
 {
 public:
-	SpecialVillain(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, float sp = 10, int l = 3);
+	enum class MovementType {
+		SIMPLE,
+		BFS
+	};
+	SpecialVillain(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, float sp = 10, int l = 3, MovementType mvtType = MovementType::SIMPLE);
 	~SpecialVillain();
 
 	void update(Real dt) override;
 	Ogre::Vector3 chooseDirection() override;
+
+	void setMovementType(MovementType mvt);
 
 protected:
 	// MESHES -----------------------------------------
@@ -32,6 +38,7 @@ protected:
 	const Vector3 HEAD_SCALE = { 60, 120, 60 };
 	Vector3 GUN_SCALE = { 40, 30, 20 };
 
+	// OTHER ----------------------------------------
 	Ogre::Timer* _timer;
 
 	Ogre::SceneNode* _top;
@@ -41,11 +48,17 @@ protected:
 	Vector3 _headBasePos;
 	std::vector<Ogre::SceneNode*> _swords;
 
+	MovementType _movementType;
+
+	// METHODS ---------------------------------------
 	void setup() override; 
 	Ogre::SceneNode* createWheel(int id, bool left, bool front);
 	Ogre::SceneNode* createPart(Ogre::SceneNode* parent, const std::string& mesh, const Vector3& scale, std::string materialName = "");
 
 	Vector3 calculateNodeBoxSize(Ogre::SceneNode* node);
+
+	Ogre::Vector3 chooseDirectionSimple();
+	Ogre::Vector3 chooseDirectionBFS();
 
 	Ogre::Vector2 bfs(std::vector<std::vector<Block*>> blocks, std::pair<int, int> origin, std::pair<int, int> target);
 	bool isBlockValid(int i, int j, int ROWS, int COLS);

@@ -128,7 +128,8 @@ void Labyrinth::createLabyrinth(std::istream& input, IG2Project* ig2) {
 				villainPos.x += iCol * BLOCK_SIZE;
 				villainPos.z += iRow * BLOCK_SIZE;
 
-				Character* villain = new SpecialVillain(villainPos, mSM->getRootSceneNode()->createChildSceneNode(), mSM);
+				SpecialVillain* villain = new SpecialVillain(villainPos, mSM->getRootSceneNode()->createChildSceneNode(), mSM);
+				villain->setMovementType(SpecialVillain::MovementType::BFS);
 				villain->setLabyrinth(this);
 
 				_characters.push_back(villain);

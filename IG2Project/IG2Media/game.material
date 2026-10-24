@@ -1,21 +1,32 @@
-material game/stonesFloor{
+material game/walls {
     technique { 
 	pass {  
 	    texture_unit {
-		texture BeachStones.jpg
-	    }
+            texture RustedMetal.jpg
+		}
 	}
     }
 }
 
-material game/grassFloor {
+material game/floor {
     technique { 
 	pass {  
 	    texture_unit {
-			texture grass.jpg
-	    }
+            texture grass.png
+          }
 	}
     }
+}
+
+material game/sky {
+	technique {
+		pass {
+			lighting off
+			texture_unit {
+				texture spaceSky.jpg
+			}
+		}
+	}
 }
 
 material game/tankBody {

@@ -1,7 +1,7 @@
 19
 19
-game/stonesFloor
-game/grassFloor
+game/walls
+game/floor
 point
 ixxxxxxxxxxxxxxxxxx
 xooohooooboooooooox

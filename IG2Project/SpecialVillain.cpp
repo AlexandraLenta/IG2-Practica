@@ -4,7 +4,7 @@
 #include "Block.h"
 #include <queue>
 
-SpecialVillain::SpecialVillain(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, float sp, int l) : Villain(initPos, node, sceneMng, sp, l) {
+SpecialVillain::SpecialVillain(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, float sp, int l, MovementType mvtType) : Villain(initPos, node, sceneMng, sp, l) {
     setup();
     mNode->setScale(mNode->getScale() * 0.6);
     _timer = new Ogre::Timer();
@@ -13,6 +13,10 @@ SpecialVillain::SpecialVillain(Vector3 initPos, SceneNode* node, SceneManager* s
 SpecialVillain::~SpecialVillain() {
     delete _timer;
     _timer = nullptr;
+}
+
+void SpecialVillain::setMovementType(MovementType mvt) {
+    _movementType = mvt;
 }
 
 void SpecialVillain::update(Real dt) {
@@ -37,6 +41,51 @@ void SpecialVillain::update(Real dt) {
 }
 
 Ogre::Vector3 SpecialVillain::chooseDirection() {
+    switch (_movementType) {
+    case MovementType::SIMPLE:
+        return chooseDirectionSimple();
+        break;
+    case MovementType::BFS:
+        return chooseDirectionBFS();
+        break;
+   }
+}
+
+Ogre::Vector3 SpecialVillain::chooseDirectionSimple() {
+    std::vector<Vector2> possibleNextDirs;
+    const Block* b;
+
+    const Block* playerBlock = _labyrinth->getBlock(_labyrinth->getPlayer()->getPosition());
+
+    if (playerBlock == nullptr)
+        return getGridOrientation();
+
+    Vector2 target = { playerBlock->getPosition().x, playerBlock->getPosition().z };
+
+    Vector2 best = Vector2::ZERO;
+    Real bestDist = std::numeric_limits<Real>::max();
+
+    for (Vector2 d : _directions) {
+        const Block* b = _labyrinth->getBlock(Vector2{ getPosition().x, getPosition().z } + d * _labyrinth->BLOCK_SIZE);
+        if (b == nullptr || !b->canPassThrough())
+            continue;
+
+        Real dist = Vector2{ b->getPosition().x, b->getPosition().z }.distance(target);
+        if (dist < bestDist) {
+            bestDist = dist;
+            best = d;
+        }
+    }
+
+    if (best == Vector2::ZERO || bestDist == std::numeric_limits<Real>::max())  // nowhere to go, keep direction
+        return getGridOrientation();
+
+    setNewDir(best);
+
+    return { best.x, 0, best.y };
+}
+
+Ogre::Vector3 SpecialVillain::chooseDirectionBFS() {
     Ogre::Vector2 dir = bfs(_labyrinth->getBlocks(),
         _labyrinth->getBlockRowColFromPos({ getPosition().x, getPosition().z }),
         _labyrinth->getBlockRowColFromPos({ _labyrinth->getPlayer()->getPosition().x, _labyrinth->getPlayer()->getPosition().z }));
