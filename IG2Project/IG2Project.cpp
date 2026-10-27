@@ -147,10 +147,12 @@ void IG2Project::createEnvironment() {
     floorNode->translate({ -_labyrinth->BLOCK_SIZE / 2.f, 0, -_labyrinth->BLOCK_SIZE / 2.f });
 
     // SKY
-    Ogre::Plane skyPlane;
+    /*Ogre::Plane skyPlane;
     skyPlane.d = 1000;
     skyPlane.normal = Ogre::Vector3::UNIT_Y;
-    mSM->setSkyPlane(true, skyPlane, "game/sky", 1500, 50, true, 1.5, 50, 50);
+    mSM->setSkyPlane(true, skyPlane, "Examples/SpaceSkyBox", 1500, 50, true, 1.5, 50, 50);*/
+
+    mSM->setSkyBox(true, "Examples/SpaceSkyBox", 5000);
 }
 
 
