@@ -4,6 +4,7 @@
 #include "SpecialVillain.h"
 #include <fstream>
 #include "GameInfoOverlay.h"
+#include "AnimatedSinbad.h"
 
 using namespace Ogre;
 
@@ -75,11 +76,22 @@ void IG2Project::setup(void) {
 }
 
 void IG2Project::setupScene(void) {
-    createOverlay();
     createCamera();
     createLights();
-    createMap();
+
+    setupIntro();
+}
+
+void IG2Project::setupIntro() {
     createEnvironment();
+
+    _introAnimation = new AnimatedSinbad({ 0, 0, 0 }, mSM->createSceneNode("intro_sinbad"), mSM);
+}
+
+void IG2Project::setupLabyrinth() {
+    createOverlay();
+    createMap();
+    createLabyrinthFloor();
 
     _infoOverlay->setPlayer(_player);
     _infoOverlay->updateGameInfo();
@@ -133,9 +145,25 @@ void IG2Project::createMap() {
 
 void IG2Project::createEnvironment() {
     // FLOOR
+    MeshManager::getSingleton().createPlane("intro_floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+        Plane(Vector3::UNIT_Y, 0),
+        INTRO_FLOOR_SIZE.first, INTRO_FLOOR_SIZE.second, 50, 50, true, 1, 5, 5,
+        Vector3::UNIT_Z);
+
+    Entity* entFloor = mSM->createEntity("floor", "floor");
+    entFloor->setMaterialName(_floorMaterial);
+    SceneNode* floorNode = mSM->getRootSceneNode()->createChildSceneNode();
+    floorNode->attachObject(entFloor);
+
+    // SKY
+    mSM->setSkyBox(true, "Examples/SpaceSkyBox", 5000);
+}
+
+void IG2Project::createLabyrinthFloor() {
+    // FLOOR
     std::pair<int, int> size = _labyrinth->getLabyrinthSize();
 
-    MeshManager::getSingleton().createPlane("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+    MeshManager::getSingleton().createPlane("labyrinth_floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
         Plane(Vector3::UNIT_Y, 0),
         size.first, size.second, 50, 50, true, 1, 5, 5,
         Vector3::UNIT_Z);
@@ -145,14 +173,6 @@ void IG2Project::createEnvironment() {
     SceneNode* floorNode = mSM->getRootSceneNode()->createChildSceneNode();
     floorNode->attachObject(entFloor);
     floorNode->translate({ -_labyrinth->BLOCK_SIZE / 2.f, 0, -_labyrinth->BLOCK_SIZE / 2.f });
-
-    // SKY
-    /*Ogre::Plane skyPlane;
-    skyPlane.d = 1000;
-    skyPlane.normal = Ogre::Vector3::UNIT_Y;
-    mSM->setSkyPlane(true, skyPlane, "Examples/SpaceSkyBox", 1500, 50, true, 1.5, 50, 50);*/
-
-    mSM->setSkyBox(true, "Examples/SpaceSkyBox", 5000);
 }
 
 
@@ -173,6 +193,10 @@ void IG2Project::createOverlay() {
 void IG2Project::frameRendered(const Ogre::FrameEvent& evt) {
     if (_labyrinth != nullptr) {
         _labyrinth->updateLabyrinth(evt.timeSinceLastFrame);
+    }
+
+    if (_introAnimation != nullptr) {
+        _introAnimation->update(evt.timeSinceLastFrame);
     }
 }
 

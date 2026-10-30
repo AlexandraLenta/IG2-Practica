@@ -5,267 +5,267 @@
 #include <queue>
 
 SpecialVillain::SpecialVillain(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, float sp, int l, MovementType mvtType) : Villain(initPos, node, sceneMng, sp, l) {
-    setup();
-    mNode->setScale(mNode->getScale() * 0.6);
-    _timer = new Ogre::Timer();
+	setup();
+	mNode->setScale(mNode->getScale() * 0.6);
+	_timer = new Ogre::Timer();
 }
 
 SpecialVillain::~SpecialVillain() {
-    delete _timer;
-    _timer = nullptr;
+	delete _timer;
+	_timer = nullptr;
 }
 
 void SpecialVillain::setMovementType(MovementType mvt) {
-    _movementType = mvt;
+	_movementType = mvt;
 }
 
 void SpecialVillain::update(Real dt) {
-    // total seconds passed -- for periodical movement
-    float t = _timer->getMilliseconds() / 1000.f;
+	// total seconds passed -- for periodical movement
+	float t = _timer->getMilliseconds() / 1000.f;
 
-    // WHEEL SPIN -------------
-    float wheelDegPerSec = 360.f; // full spin in one second
+	// WHEEL SPIN -------------
+	float wheelDegPerSec = 360.f; // full spin in one second
 
-    // uses dt for continuous movement
-    for (int i = 0; i < _wheelsSign.size(); i++) {
-        _wheelsSign[i].first->rotate(Ogre::Vector3::UNIT_Y, Ogre::Degree(_wheelsSign[i].second * wheelDegPerSec * dt));
-        _swords[i]->setPosition(Ogre::Vector3{ 0, 0, 0 } + Ogre::Vector3(0, 5.f * std::sin(t * 6.f), 0));
-    }
+	// uses dt for continuous movement
+	for (int i = 0; i < _wheelsSign.size(); i++) {
+		_wheelsSign[i].first->rotate(Ogre::Vector3::UNIT_Y, Ogre::Degree(_wheelsSign[i].second * wheelDegPerSec * dt));
+		_swords[i]->setPosition(Ogre::Vector3{ 0, 0, 0 } + Ogre::Vector3(0, 5.f * std::sin(t * 6.f), 0));
+	}
 
-    // TOP TURN -----------------------
-    float yaw = 30.f * std::sin(t * 1.5f);
-    _top->setOrientation(Ogre::Quaternion(Ogre::Degree(yaw), Vector3::UNIT_Y));
+	// TOP TURN -----------------------
+	float yaw = 30.f * std::sin(t * 1.5f);
+	_top->setOrientation(Ogre::Quaternion(Ogre::Degree(yaw), Vector3::UNIT_Y));
 
-    // HEAD UP & DOWN --------------------
-    _head->setPosition(_headBasePos + Ogre::Vector3(0, 5.f * std::sin(t * 6.f), 0));
+	// HEAD UP & DOWN --------------------
+	_head->setPosition(_headBasePos + Ogre::Vector3(0, 5.f * std::sin(t * 6.f), 0));
 }
 
 Ogre::Vector3 SpecialVillain::chooseDirection() {
-    switch (_movementType) {
-    case MovementType::SIMPLE:
-        return chooseDirectionSimple();
-        break;
-    case MovementType::BFS:
-        return chooseDirectionBFS();
-        break;
-   }
+	switch (_movementType) {
+	case MovementType::SIMPLE:
+		return chooseDirectionSimple();
+		break;
+	case MovementType::BFS:
+		return chooseDirectionBFS();
+		break;
+	}
 }
 
 Ogre::Vector3 SpecialVillain::chooseDirectionSimple() {
-    std::vector<Vector2> possibleNextDirs;
-    const Block* b;
+	std::vector<Vector2> possibleNextDirs;
+	const Block* b;
 
-    const Block* playerBlock = _labyrinth->getBlock(_labyrinth->getPlayer()->getPosition());
+	const Block* playerBlock = _labyrinth->getBlock(_labyrinth->getPlayer()->getPosition());
 
-    if (playerBlock == nullptr)
-        return getGridOrientation();
+	if (playerBlock == nullptr)
+		return getGridOrientation();
 
-    Vector2 target = { playerBlock->getPosition().x, playerBlock->getPosition().z };
+	Vector2 target = { playerBlock->getPosition().x, playerBlock->getPosition().z };
 
-    Vector2 best = Vector2::ZERO;
-    Real bestDist = std::numeric_limits<Real>::max();
+	Vector2 best = Vector2::ZERO;
+	Real bestDist = std::numeric_limits<Real>::max();
 
-    for (Vector2 d : _directions) {
-        const Block* b = _labyrinth->getBlock(Vector2{ getPosition().x, getPosition().z } + d * _labyrinth->BLOCK_SIZE);
-        if (b == nullptr || !b->canPassThrough())
-            continue;
+	for (Vector2 d : _directions) {
+		const Block* b = _labyrinth->getBlock(Vector2{ getPosition().x, getPosition().z } + d * _labyrinth->BLOCK_SIZE);
+		if (b == nullptr || !b->canPassThrough())
+			continue;
 
-        Real dist = Vector2{ b->getPosition().x, b->getPosition().z }.distance(target);
-        if (dist < bestDist) {
-            bestDist = dist;
-            best = d;
-        }
-    }
+		Real dist = Vector2{ b->getPosition().x, b->getPosition().z }.distance(target);
+		if (dist < bestDist) {
+			bestDist = dist;
+			best = d;
+		}
+	}
 
-    if (best == Vector2::ZERO || bestDist == std::numeric_limits<Real>::max())  // nowhere to go, keep direction
-        return getGridOrientation();
+	if (best == Vector2::ZERO || bestDist == std::numeric_limits<Real>::max())  // nowhere to go, keep direction
+		return getGridOrientation();
 
-    setNewDir(best);
+	setNewDir(best);
 
-    return { best.x, 0, best.y };
+	return { best.x, 0, best.y };
 }
 
 Ogre::Vector3 SpecialVillain::chooseDirectionBFS() {
-    Ogre::Vector2 dir = bfs(_labyrinth->getBlocks(),
-        _labyrinth->getBlockRowColFromPos({ getPosition().x, getPosition().z }),
-        _labyrinth->getBlockRowColFromPos({ _labyrinth->getPlayer()->getPosition().x, _labyrinth->getPlayer()->getPosition().z }));
+	Ogre::Vector2 dir = bfs(_labyrinth->getBlocks(),
+		_labyrinth->getBlockRowColFromPos({ getPosition().x, getPosition().z }),
+		_labyrinth->getBlockRowColFromPos({ _labyrinth->getPlayer()->getPosition().x, _labyrinth->getPlayer()->getPosition().z }));
 
-    if (dir == Ogre::Vector2::ZERO)
-        return getGridOrientation();   // on the player, or unreachable: keep going
+	if (dir == Ogre::Vector2::ZERO)
+		return getGridOrientation();   // on the player, or unreachable: keep going
 
-    setNewDir(dir);
-    return { dir.x, 0, dir.y };
+	setNewDir(dir);
+	return { dir.x, 0, dir.y };
 }
 
 Ogre::Vector2 SpecialVillain::bfs(std::vector<std::vector<Block*>> blocks, std::pair<int, int> origin, std::pair<int, int> target) {
-    if (origin == target)
-        return Ogre::Vector2::ZERO;
+	if (origin == target)
+		return Ogre::Vector2::ZERO;
 
-    const int rows = blocks.size(), cols = blocks[0].size();
+	const int rows = blocks.size(), cols = blocks[0].size();
 
-    std::vector<std::vector<bool>> visited(blocks.size(), std::vector<bool>(blocks[0].size(), false));
-    std::vector<std::vector<int>>  firstDir(rows, std::vector<int>(cols, -1));  // index in _directions
+	std::vector<std::vector<bool>> visited(blocks.size(), std::vector<bool>(blocks[0].size(), false));
+	std::vector<std::vector<int>>  firstDir(rows, std::vector<int>(cols, -1));  // index in _directions
 
-    std::queue<std::pair<int, int>> q;
+	std::queue<std::pair<int, int>> q;
 
-    q.push(origin);
-    visited[origin.first][origin.second] = true;
+	q.push(origin);
+	visited[origin.first][origin.second] = true;
 
-    while (!q.empty()) {
-        auto v = q.front(); q.pop();
-        int i = v.first, j = v.second;
+	while (!q.empty()) {
+		auto v = q.front(); q.pop();
+		int i = v.first, j = v.second;
 
-        for (int k = 0; k < _directions.size(); k++) {
-            int ni = i + _directions[k].y, nj = j + _directions[k].x;
+		for (int k = 0; k < _directions.size(); k++) {
+			int ni = i + _directions[k].y, nj = j + _directions[k].x;
 
-            if (isBlockValid(ni, nj, rows, cols) && !visited[ni][nj] && blocks[ni][nj]->canPassThrough()) {
-                visited[ni][nj] = true;
+			if (isBlockValid(ni, nj, rows, cols) && !visited[ni][nj] && blocks[ni][nj]->canPassThrough()) {
+				visited[ni][nj] = true;
 
-                firstDir[ni][nj] = (std::pair(i, j) == origin) ? k : firstDir[i][j]; // if we are in origin, we take current dir, if we are not, we inherit parent dir
+				firstDir[ni][nj] = (std::pair(i, j) == origin) ? k : firstDir[i][j]; // if we are in origin, we take current dir, if we are not, we inherit parent dir
 
-                if (std::pair(ni, nj) == target)
-                    return _directions[firstDir[ni][nj]];
+				if (std::pair(ni, nj) == target)
+					return _directions[firstDir[ni][nj]];
 
-                q.push({ ni, nj });
-            }
-        }
-    }
+				q.push({ ni, nj });
+			}
+		}
+	}
 }
 
 bool SpecialVillain::isBlockValid(int i, int j, int ROWS, int COLS) {
-    return i < ROWS && i >= 0 && j < COLS && j >= 0;
+	return i < ROWS && i >= 0 && j < COLS && j >= 0;
 }
 
 void SpecialVillain::setup() {
-    // BODY --------------------------
-    entity = mSM->createEntity(BODY_MESH); 
-    mNode->attachObject(entity);
-    this->setPosition(initialPosition);
-    mNode->setScale(0.15, 0.1, 0.15);
+	// BODY --------------------------
+	entity = mSM->createEntity(BODY_MESH);
+	mNode->attachObject(entity);
+	this->setPosition(initialPosition);
+	mNode->setScale(0.15, 0.1, 0.15);
 
-    entity->setMaterialName(BODY_MATERIAL);
+	entity->setMaterialName(BODY_MATERIAL);
 
-    Vector3 bodySize = calculateNodeBoxSize(mNode);
+	Vector3 bodySize = calculateNodeBoxSize(mNode);
 
-    Real halfH = bodySize.y / 2.0f;
+	Real halfH = bodySize.y / 2.0f;
 
-    mNode->setPosition(initialPosition.x, initialPosition.y + halfH/7.f, initialPosition.z);
+	mNode->setPosition(initialPosition.x, initialPosition.y + halfH / 7.f, initialPosition.z);
 
-    // TOP ----------------------------
-    _top = createPart(mNode, TOP_MESH, TOP_SCALE, TOP_MATERIAL);
+	// TOP ----------------------------
+	_top = createPart(mNode, TOP_MESH, TOP_SCALE, TOP_MATERIAL);
 
-    Vector3 topSize = calculateNodeBoxSize(_top);
+	Vector3 topSize = calculateNodeBoxSize(_top);
 
-    Real topHalfH = topSize.y / (2.0f * mNode->getScale().y);
+	Real topHalfH = topSize.y / (2.0f * mNode->getScale().y);
 
-    _top->setPosition(0, halfH + topHalfH/3.f, 0);
+	_top->setPosition(0, halfH + topHalfH / 3.f, 0);
 
-    // HEAD ----------------------------
-    _head = createPart(_top, HEAD_MESH, HEAD_SCALE);
+	// HEAD ----------------------------
+	_head = createPart(_top, HEAD_MESH, HEAD_SCALE);
 
-    Vector3 headSize = calculateNodeBoxSize(_head);
+	Vector3 headSize = calculateNodeBoxSize(_head);
 
-    Real headHalfH = headSize.y / 2.0f / _top->getScale().y;
+	Real headHalfH = headSize.y / 2.0f / _top->getScale().y;
 
-    _head->setPosition(0, headHalfH/5.f, 0);
-    _headBasePos = _head->getPosition();
+	_head->setPosition(0, headHalfH / 5.f, 0);
+	_headBasePos = _head->getPosition();
 
-    // GUN ------------------------------
-    _gun = createPart(_top, GUN_MESH, GUN_SCALE);
+	// GUN ------------------------------
+	_gun = createPart(_top, GUN_MESH, GUN_SCALE);
 
-    Vector3 gunSize = calculateNodeBoxSize(_gun);
+	Vector3 gunSize = calculateNodeBoxSize(_gun);
 
-    Real gunHalfD = gunSize.z / 2.0f / _top->getScale().z;
-    Real topHalfD = topSize.z / 2.0f / _top->getScale().z;
+	Real gunHalfD = gunSize.z / 2.0f / _top->getScale().z;
+	Real topHalfD = topSize.z / 2.0f / _top->getScale().z;
 
-    _gun->rotate(Ogre::Vector3::UNIT_Y, Ogre::Degree(90));
-    _gun->rotate(Ogre::Vector3::UNIT_Z, Ogre::Degree(-45));
-    _gun->setPosition(0, 1.5f*topHalfH, topHalfD + gunHalfD/2.f);
+	_gun->rotate(Ogre::Vector3::UNIT_Y, Ogre::Degree(90));
+	_gun->rotate(Ogre::Vector3::UNIT_Z, Ogre::Degree(-45));
+	_gun->setPosition(0, 1.5f * topHalfH, topHalfD + gunHalfD / 2.f);
 
-    // WHEELS ----------------------------
-    _wheelsSign.push_back({ createWheel(1, true, true), -1 });   // front left
-    _wheelsSign.push_back({ createWheel(2, false, true), 1 });   // front right
-    _wheelsSign.push_back({ createWheel(3, true, false), -1 });  // back left
-    _wheelsSign.push_back({ createWheel(4, false, false), 1 });  // back right
+	// WHEELS ----------------------------
+	_wheelsSign.push_back({ createWheel(1, true, true), -1 });   // front left
+	_wheelsSign.push_back({ createWheel(2, false, true), 1 });   // front right
+	_wheelsSign.push_back({ createWheel(3, true, false), -1 });  // back left
+	_wheelsSign.push_back({ createWheel(4, false, false), 1 });  // back right
 }
 
 Ogre::SceneNode* SpecialVillain::createPart(Ogre::SceneNode* parent, const std::string& mesh, const Vector3& scale, std::string materialName) {
-    Ogre::SceneNode* node = parent->createChildSceneNode();
-    Ogre::Entity* ent = mSM->createEntity(mesh);
-    node->attachObject(ent);
-    
-    if (!materialName.empty()) {
-        ent->setMaterialName(materialName);
-    }
+	Ogre::SceneNode* node = parent->createChildSceneNode();
+	Ogre::Entity* ent = mSM->createEntity(mesh);
+	node->attachObject(ent);
 
-    node->setScale(scale);
-    return node;
+	if (!materialName.empty()) {
+		ent->setMaterialName(materialName);
+	}
+
+	node->setScale(scale);
+	return node;
 }
 
 Ogre::SceneNode* SpecialVillain::createWheel(int id, bool left, bool front) {
-    const Vector3 WHEEL_SCALE = { 6, 1.8, 6 };
-    const Vector3 WHEEL_HEAD_SCALE = { 0.08, 0.27, 0.03 };
-    const Vector3 WHEEL_SWORD_SCALE = { 1, 3.33, 1 };
+	const Vector3 WHEEL_SCALE = { 6, 1.8, 6 };
+	const Vector3 WHEEL_HEAD_SCALE = { 0.08, 0.27, 0.03 };
+	const Vector3 WHEEL_SWORD_SCALE = { 1, 3.33, 1 };
 
-    const std::string idStr = std::to_string(id);
+	const std::string idStr = std::to_string(id);
 
-    // signs depend on bools
-    const Real sideX = left ? -1.f : 1.f;   // left: -X, right: +X
-    const Real sideZ = front ? 1.f : -1.f;  // front: +Z, back: -Z
+	// signs depend on bools
+	const Real sideX = left ? -1.f : 1.f;   // left: -X, right: +X
+	const Real sideZ = front ? 1.f : -1.f;  // front: +Z, back: -Z
 
-    // Altura media del cuerpo (para colocar la rueda debajo)
-    Real halfH = calculateNodeBoxSize(mNode).y / 2.0f;
+	// Altura media del cuerpo (para colocar la rueda debajo)
+	Real halfH = calculateNodeBoxSize(mNode).y / 2.0f;
 
-    // Rueda
-    Ogre::SceneNode* wheel = createPart(mNode, WHEEL_MESH, WHEEL_SCALE);
+	// Rueda
+	Ogre::SceneNode* wheel = createPart(mNode, WHEEL_MESH, WHEEL_SCALE);
 
-    Vector3 wheelSize = calculateNodeBoxSize(wheel);
-    Real wheelHalfW = wheelSize.x / 2.0f / mNode->getScale().x;
-    Real wheelHalfH = wheelSize.y / 4.0f / mNode->getScale().y;
+	Vector3 wheelSize = calculateNodeBoxSize(wheel);
+	Real wheelHalfW = wheelSize.x / 2.0f / mNode->getScale().x;
+	Real wheelHalfH = wheelSize.y / 4.0f / mNode->getScale().y;
 
-    Real WHEEL_POS_Y = -wheelHalfH - halfH;
-    Real WHEEL_POS_X = wheelHalfW / 1.95f;
-    Real WHEEL_POS_Z = wheelHalfW / 2.1f;
+	Real WHEEL_POS_Y = -wheelHalfH - halfH;
+	Real WHEEL_POS_X = wheelHalfW / 1.95f;
+	Real WHEEL_POS_Z = wheelHalfW / 2.1f;
 
-    // izquierda: +90 en Z, derecha: -90 en Z
-    wheel->rotate(Ogre::Vector3::UNIT_Z, Ogre::Degree(-sideX * 90));
-    wheel->setPosition(sideX * WHEEL_POS_X, WHEEL_POS_Y, sideZ * WHEEL_POS_Z);
+	// izquierda: +90 en Z, derecha: -90 en Z
+	wheel->rotate(Ogre::Vector3::UNIT_Z, Ogre::Degree(-sideX * 90));
+	wheel->setPosition(sideX * WHEEL_POS_X, WHEEL_POS_Y, sideZ * WHEEL_POS_Z);
 
-    // Decoración (cabeza de ogro) dentro de la rueda
-    Ogre::SceneNode* wheelHead = createPart(wheel, WHEEL_DECO_MESH, WHEEL_HEAD_SCALE);
-    wheelHead->setPosition(0, wheelHalfH / 4.f, 0);
-    wheelHead->rotate(Ogre::Vector3::UNIT_Y, Ogre::Degree(sideX * 90), Ogre::Node::TS_WORLD);
-    wheelHead->rotate(Ogre::Vector3::UNIT_X, Ogre::Degree(90), Ogre::Node::TS_WORLD);
+	// Decoración (cabeza de ogro) dentro de la rueda
+	Ogre::SceneNode* wheelHead = createPart(wheel, WHEEL_DECO_MESH, WHEEL_HEAD_SCALE);
+	wheelHead->setPosition(0, wheelHalfH / 4.f, 0);
+	wheelHead->rotate(Ogre::Vector3::UNIT_Y, Ogre::Degree(sideX * 90), Ogre::Node::TS_WORLD);
+	wheelHead->rotate(Ogre::Vector3::UNIT_X, Ogre::Degree(90), Ogre::Node::TS_WORLD);
 
-    // Decoración (espada) dentro de la rueda
-    Ogre::SceneNode* wheelSword = createPart(wheel, WHEEL_DECO2_MESH, WHEEL_SWORD_SCALE);
-    wheelSword->setPosition(0, 0, 0);
-    wheelSword->rotate(Ogre::Vector3::UNIT_Y, Ogre::Degree(sideX * 90), Ogre::Node::TS_WORLD);
-    wheelSword->rotate(Ogre::Vector3::UNIT_X, Ogre::Degree(90), Ogre::Node::TS_WORLD);
+	// Decoración (espada) dentro de la rueda
+	Ogre::SceneNode* wheelSword = createPart(wheel, WHEEL_DECO2_MESH, WHEEL_SWORD_SCALE);
+	wheelSword->setPosition(0, 0, 0);
+	wheelSword->rotate(Ogre::Vector3::UNIT_Y, Ogre::Degree(sideX * 90), Ogre::Node::TS_WORLD);
+	wheelSword->rotate(Ogre::Vector3::UNIT_X, Ogre::Degree(90), Ogre::Node::TS_WORLD);
 
-    _swords.push_back(wheelSword);
+	_swords.push_back(wheelSword);
 
-    return wheel;
+	return wheel;
 }
 
 Vector3 SpecialVillain::calculateNodeBoxSize(Ogre::SceneNode* node) {
 
-    Vector3 result;
+	Vector3 result;
 
-    if (node->getAttachedObjects().size() > 0) {
-        Entity* mEntity = static_cast<Entity*>(node->getAttachedObject(0));
-        const AxisAlignedBox& aab = mEntity->getBoundingBox();
-        Vector3 min = aab.getMinimum() * node->getScale();
-        Vector3 max = aab.getMaximum() * node->getScale();
-        Real paddingFactor = MeshManager::getSingleton().getBoundsPaddingFactor();
+	if (node->getAttachedObjects().size() > 0) {
+		Entity* mEntity = static_cast<Entity*>(node->getAttachedObject(0));
+		const AxisAlignedBox& aab = mEntity->getBoundingBox();
+		Vector3 min = aab.getMinimum() * node->getScale();
+		Vector3 max = aab.getMaximum() * node->getScale();
+		Real paddingFactor = MeshManager::getSingleton().getBoundsPaddingFactor();
 
-        // adjust min & max to exclude the padding factor..
-        Vector3 newMin = min + (max - min) * paddingFactor;
-        Vector3 newMax = max + (min - max) * paddingFactor;
-        result = newMax - newMin;
-    }
-    else {
-        result = { 0,0,0 };
-    }
-    return result;
+		// adjust min & max to exclude the padding factor..
+		Vector3 newMin = min + (max - min) * paddingFactor;
+		Vector3 newMax = max + (min - max) * paddingFactor;
+		result = newMax - newMin;
+	}
+	else {
+		result = { 0,0,0 };
+	}
+	return result;
 }

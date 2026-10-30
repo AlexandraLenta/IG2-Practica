@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AnimatedSinbad.cpp" />
     <ClCompile Include="Block.cpp" />
     <ClCompile Include="BreakableBlock.cpp" />
     <ClCompile Include="Character.cpp" />
@@ -37,6 +38,7 @@
     <ClCompile Include="WallBlock.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AnimatedSinbad.h" />
     <ClInclude Include="Block.h" />
     <ClInclude Include="BreakableBlock.h" />
     <ClInclude Include="Character.h" />

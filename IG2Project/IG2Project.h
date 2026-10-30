@@ -21,8 +21,10 @@ class Labyrinth;
 class Character;
 class SpecialVillain;
 class GameInfoOverlay;
+class AnimatedSinbad;
 
 static const std::string MAP_NAME = "../../IG2Project/IG2Project/IG2Media/stage1b.txt";
+static const std::pair<int, int> INTRO_FLOOR_SIZE = { 40, 40 };
 
 class IG2Project: public OgreBites::ApplicationContext, OgreBites::InputListener {
 
@@ -44,6 +46,7 @@ protected:
     virtual void shutdown();
     virtual void setupScene();
 
+    AnimatedSinbad* _introAnimation = nullptr;
     Player* _player = nullptr;
     Labyrinth* _labyrinth = nullptr;
     SpecialVillain* _villain = nullptr;
@@ -58,11 +61,14 @@ protected:
     std::string _floorMaterial;
 
 private:
+    void setupIntro();
+    void setupLabyrinth();
     void createOverlay();
     void createCamera();
     void createLights();
     void createEnvironment();
     void createMap();
+    void createLabyrinthFloor();
 };
 
 #endif
