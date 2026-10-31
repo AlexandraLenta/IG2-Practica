@@ -86,7 +86,6 @@ void IG2Project::setupIntro() {
     createEnvironment();
 
     _introAnimation = new AnimatedSinbad({ 0, 0, 0 }, 20, mSM->getRootSceneNode()->createChildSceneNode("intro_sinbad"), mSM);
-    std::cout << _introAnimation->getPosition();
 }
 
 void IG2Project::setupLabyrinth() {
