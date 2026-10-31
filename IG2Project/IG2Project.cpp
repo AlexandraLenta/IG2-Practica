@@ -85,7 +85,8 @@ void IG2Project::setupScene(void) {
 void IG2Project::setupIntro() {
     createEnvironment();
 
-    _introAnimation = new AnimatedSinbad({ 0, 0, 0 }, mSM->createSceneNode("intro_sinbad"), mSM);
+    _introAnimation = new AnimatedSinbad({ 0, 0, 0 }, 20, mSM->getRootSceneNode()->createChildSceneNode("intro_sinbad"), mSM);
+    std::cout << _introAnimation->getPosition();
 }
 
 void IG2Project::setupLabyrinth() {
@@ -119,7 +120,7 @@ void IG2Project::createCamera() {
 }
 
 void IG2Project::createLights() {
-    mSM->setAmbientLight(ColourValue(0.2, 0.2, 0.2));
+    mSM->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
 
     auto* vp = getRenderWindow()->getViewport(0);
     vp->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
@@ -150,8 +151,8 @@ void IG2Project::createEnvironment() {
         INTRO_FLOOR_SIZE.first, INTRO_FLOOR_SIZE.second, 50, 50, true, 1, 5, 5,
         Vector3::UNIT_Z);
 
-    Entity* entFloor = mSM->createEntity("floor", "floor");
-    entFloor->setMaterialName(_floorMaterial);
+    Entity* entFloor = mSM->createEntity("intro_floor", "intro_floor");
+    entFloor->setMaterialName("game/floor");
     SceneNode* floorNode = mSM->getRootSceneNode()->createChildSceneNode();
     floorNode->attachObject(entFloor);
 
