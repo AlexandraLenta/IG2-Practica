@@ -71,7 +71,7 @@ void Labyrinth::createLabyrinth(std::istream& input, IG2Project* ig2) {
 
 	_blocks = std::vector<std::vector<Block*>>(_numRows, std::vector<Block*>(_numCols));
 
-	Vector3 absoluteStartingPos = { -(float)(_numRows*BLOCK_SIZE)/2.f, BLOCK_SIZE/2.f, -(float)(_numCols*BLOCK_SIZE)/2.f };
+	Vector3 absoluteStartingPos = { -(float)(_numCols * BLOCK_SIZE) / 2.f, BLOCK_SIZE / 2.f, -(float)(_numRows * BLOCK_SIZE) / 2.f };
 	_labyrinthOrigin = getPosition() + absoluteStartingPos;
 	Vector3 nextPos = _labyrinthOrigin;
 
@@ -117,7 +117,7 @@ void Labyrinth::createLabyrinth(std::istream& input, IG2Project* ig2) {
 				villainPos.x += iCol * BLOCK_SIZE;
 				villainPos.z += iRow * BLOCK_SIZE;
 
-				Character* villain = new SimpleVillain(villainPos, mSM->getRootSceneNode()->createChildSceneNode(), mSM);
+				Character* villain = new SimpleVillain(villainPos, createChildSceneNode(), mSM);
 				villain->setLabyrinth(this);
 				_characters.push_back(villain);
 			}
@@ -128,7 +128,7 @@ void Labyrinth::createLabyrinth(std::istream& input, IG2Project* ig2) {
 				villainPos.x += iCol * BLOCK_SIZE;
 				villainPos.z += iRow * BLOCK_SIZE;
 
-				SpecialVillain* villain = new SpecialVillain(villainPos, mSM->getRootSceneNode()->createChildSceneNode(), mSM);
+				SpecialVillain* villain = new SpecialVillain(villainPos, createChildSceneNode(), mSM);
 				villain->setMovementType(SpecialVillain::MovementType::BFS);
 				villain->setLabyrinth(this);
 
@@ -168,11 +168,12 @@ Block* Labyrinth::createBlock(Vector3 pos, BlockType type) {
 		break;
 	}
 
-	blockObj->setScale(getCubeResizeScale(blockObj));
 	
 	if (blockObj->hasEntity()) {
+		blockObj->setScale(getCubeResizeScale(blockObj));
 		blockObj->setMaterialName(_wallMaterial);
 	}
+
 	return blockObj;
 }
 
@@ -331,4 +332,13 @@ std::pair<int, int> Labyrinth::getBlockRowColFromPos(Vector2 position) const {
 
 std::pair<int, int> Labyrinth::getLabyrinthSize() {
 	return { _numCols * BLOCK_SIZE, _numRows * BLOCK_SIZE };
+}
+
+void Labyrinth::setActive(bool a) {
+	_active = a;
+	_player->setVisible(a);
+}
+
+bool Labyrinth::getActive() {
+	return _active;
 }

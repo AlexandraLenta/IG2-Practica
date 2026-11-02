@@ -24,7 +24,6 @@ class GameInfoOverlay;
 class AnimatedSinbad;
 
 static const std::string MAP_NAME = "../../IG2Project/IG2Project/IG2Media/stage1b.txt";
-static const std::pair<int, int> INTRO_FLOOR_SIZE = { 40, 40 };
 
 class IG2Project: public OgreBites::ApplicationContext, OgreBites::InputListener {
 
@@ -61,6 +60,9 @@ protected:
     std::string _floorMaterial;
 
 private:
+    const int LABYRINTH_DISTANCE_Y = 400;
+    const std::pair<int, int> INTRO_FLOOR_SIZE = { 300, 150 };
+
     void setupIntro();
     void setupLabyrinth();
     void createOverlay();
@@ -69,6 +71,9 @@ private:
     void createEnvironment();
     void createMap();
     void createLabyrinthFloor();
+    void setLabyrinthCamera();
+    void startLabyrinth();
+    void dumpNode(Ogre::SceneNode* n, int depth = 0);
 };
 
 #endif

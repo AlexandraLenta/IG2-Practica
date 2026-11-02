@@ -8,7 +8,17 @@ material game/walls {
     }
 }
 
-material game/floor {
+material game/intro_floor {
+    technique { 
+	pass {  
+	    texture_unit {
+            texture RustedMetal.jpg
+          }
+	}
+    }
+}
+
+material game/labyrinth_floor {
     technique { 
 	pass {  
 	    texture_unit {

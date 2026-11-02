@@ -19,20 +19,21 @@ bool IG2Project::keyPressed(const OgreBites::KeyboardEvent& evt) {
         //cout << "Position of Sinbad: " << mSinbadNode->getPosition() << endl;
         std::cout << "Position of the camera: " << mCamNode->getPosition() << std::endl;
     }
-
-    else if (evt.keysym.sym == SDLK_UP || evt.keysym.sym == SDLK_w) {
+    else if (evt.keysym.sym == SDLK_s && _introAnimation != nullptr) {
+        startLabyrinth();
+    }
+    else if ((evt.keysym.sym == SDLK_UP || evt.keysym.sym == SDLK_w) && _labyrinth != nullptr && _labyrinth->getActive()) {
         _player->setNewDir(Player::UP);
     }
-    else if (evt.keysym.sym == SDLK_DOWN || evt.keysym.sym == SDLK_s) {
+    else if ((evt.keysym.sym == SDLK_DOWN || evt.keysym.sym == SDLK_s) && _labyrinth != nullptr && _labyrinth->getActive()) {
         _player->setNewDir(Player::DOWN);
     }
-    else if (evt.keysym.sym == SDLK_LEFT || evt.keysym.sym == SDLK_a) {
+    else if ((evt.keysym.sym == SDLK_LEFT || evt.keysym.sym == SDLK_a) && _labyrinth != nullptr && _labyrinth->getActive()) {
         _player->setNewDir(Player::LEFT);
     }
-    else if (evt.keysym.sym == SDLK_RIGHT || evt.keysym.sym == SDLK_d) {
+    else if ((evt.keysym.sym == SDLK_RIGHT || evt.keysym.sym == SDLK_d) && _labyrinth != nullptr && _labyrinth->getActive()) {
         _player->setNewDir(Player::RIGHT);
     }
-
     return true;
 }
 
@@ -80,21 +81,45 @@ void IG2Project::setupScene(void) {
     createLights();
 
     setupIntro();
+    setupLabyrinth();
 }
 
-void IG2Project::setupIntro() {
-    createEnvironment();
-
-    _introAnimation = new AnimatedSinbad({ 0, 0, 0 }, 20, mSM->getRootSceneNode()->createChildSceneNode("intro_sinbad"), mSM);
+void IG2Project::dumpNode(Ogre::SceneNode* n, int depth) {
+    std::cout << std::string(depth * 2, ' ') << n->getName()
+        << " pos=" << n->getPosition() << " scale=" << n->getScale() << "\n";
+    for (auto* o : n->getAttachedObjects())
+        std::cout << std::string(depth * 2 + 2, ' ') << "obj: " << o->getName() << "\n";
+    for (auto* c : n->getChildren())
+        dumpNode(static_cast<Ogre::SceneNode*>(c), depth + 1);
 }
 
 void IG2Project::setupLabyrinth() {
-    createOverlay();
     createMap();
+}
+
+void IG2Project::startLabyrinth() {
+    mSM->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
+
+    delete _introAnimation;
+    _introAnimation = nullptr;
+    mSM->destroyEntity("intro_floor");
+
+    createOverlay();
+
     createLabyrinthFloor();
+
+    setLabyrinthCamera();
 
     _infoOverlay->setPlayer(_player);
     _infoOverlay->updateGameInfo();
+
+    _labyrinth->setVisible(true);
+    _labyrinth->setActive(true);
+}
+ 
+void IG2Project::setLabyrinthCamera() {
+    mCamNode->setPosition(0, _labyrinth->getInitialPosition().y + LABYRINTH_DISTANCE_Y, 0);
+    mCamNode->setOrientation(Ogre::Quaternion(Ogre::Degree(-90), Ogre::Vector3::UNIT_X));
 }
 
 void IG2Project::createCamera() {
@@ -119,28 +144,19 @@ void IG2Project::createCamera() {
 }
 
 void IG2Project::createLights() {
-    mSM->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
+    mSM->setAmbientLight(ColourValue(0.9, 0.9, 0.9));
 
     auto* vp = getRenderWindow()->getViewport(0);
     vp->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 }
 
-void IG2Project::createMap() {
-    std::ifstream file;
-    file.open(MAP_NAME);
+void IG2Project::setupIntro() {
+    createEnvironment();
 
-    if (!file) {
-        throw "File not found" + MAP_NAME;
-    }
+    _introAnimation = new AnimatedSinbad({ 0, 0, 0 }, 18, mSM->getRootSceneNode()->createChildSceneNode("intro_sinbad"), mSM);
 
-    int rows, cols;
-    std::string wallMaterial;
-
-    file >> rows >> cols >> wallMaterial >> _floorMaterial;
-
-    _labyrinth = new Labyrinth({ 0, 0, 0 }, mSM->getRootSceneNode()->createChildSceneNode("labyrinth"), mSM, rows, cols, wallMaterial, file, this);
-
-    file.close();
+    mCamNode->setPosition(0, _introAnimation->calculateBoxSize().y, 40);
+    mCamNode->lookAt(_introAnimation->getInitialPosition() + Vector3{ 0, _introAnimation->calculateBoxSize().y /2.f, 0}, Ogre::Node::TS_WORLD);
 }
 
 void IG2Project::createEnvironment() {
@@ -151,12 +167,33 @@ void IG2Project::createEnvironment() {
         Vector3::UNIT_Z);
 
     Entity* entFloor = mSM->createEntity("intro_floor", "intro_floor");
-    entFloor->setMaterialName("game/floor");
+    entFloor->setMaterialName("game/intro_floor");
     SceneNode* floorNode = mSM->getRootSceneNode()->createChildSceneNode();
     floorNode->attachObject(entFloor);
 
     // SKY
     mSM->setSkyBox(true, "Examples/SpaceSkyBox", 5000);
+}
+
+void IG2Project::createMap() {
+    std::ifstream file;
+    file.open(MAP_NAME);
+
+    if (!file) {
+        throw std::string("File not found") + MAP_NAME;
+    }
+
+    int rows, cols;
+    std::string wallMaterial;
+
+    file >> rows >> cols >> wallMaterial >> _floorMaterial;
+
+    _labyrinth = new Labyrinth({ 0, 0, 0 }, mSM->getRootSceneNode()->createChildSceneNode("labyrinth"), mSM, rows, cols, wallMaterial, file, this);
+
+    file.close();
+
+    _labyrinth->setVisible(false);
+    _labyrinth->setActive(false);
 }
 
 void IG2Project::createLabyrinthFloor() {
@@ -168,13 +205,12 @@ void IG2Project::createLabyrinthFloor() {
         size.first, size.second, 50, 50, true, 1, 5, 5,
         Vector3::UNIT_Z);
 
-    Entity* entFloor = mSM->createEntity("floor", "floor");
+    Entity* entFloor = mSM->createEntity("labyrinth_floor", "labyrinth_floor");
     entFloor->setMaterialName(_floorMaterial);
     SceneNode* floorNode = mSM->getRootSceneNode()->createChildSceneNode();
     floorNode->attachObject(entFloor);
     floorNode->translate({ -_labyrinth->BLOCK_SIZE / 2.f, 0, -_labyrinth->BLOCK_SIZE / 2.f });
 }
-
 
 Character* IG2Project::createPlayer(Vector3 position) {
     _player = new Player(position, mSM->getRootSceneNode()->createChildSceneNode("player"), mSM, "Sinbad.mesh");
@@ -191,7 +227,7 @@ void IG2Project::createOverlay() {
 }
 
 void IG2Project::frameRendered(const Ogre::FrameEvent& evt) {
-    if (_labyrinth != nullptr) {
+    if (_labyrinth != nullptr && _labyrinth->getActive()) {
         _labyrinth->updateLabyrinth(evt.timeSinceLastFrame);
     }
 

@@ -7,8 +7,8 @@ class AnimatedSinbad : public IG2Object
 public:
     static constexpr std::string_view MESH = "Sinbad.mesh";
     const std::string SWORD_MESH = "Sword.mesh";
-    const double DURATION = 21;
-    const int TIME_INSTANTS = 14;
+    const double DURATION = 18;
+    const float TIME_INSTANTS = 9.5;
 
     /**
      * Constructor.
@@ -31,9 +31,9 @@ private:
     Entity* _swordEntL;
     Entity* _swordEntR;
 
-    float _danceStartInstant = 14;
+    float _danceStartInstant = TIME_INSTANTS;
     float _walkStartInstant = 2; 
-    float _swordAppearInstant = 5;
+    float _swordAppearInstant = 3.75;
     Ogre::Timer* _timer;
 
     Real _movLength;

@@ -36,10 +36,16 @@ AnimatedSinbad::AnimatedSinbad(Vector3 initPos, Real moveLength, SceneNode* node
 }
 
 AnimatedSinbad::~AnimatedSinbad() {
-    if (_swordEntL)
-        mSM->destroyEntity(_swordEntL);
-    if (_swordEntR)
-        mSM->destroyEntity(_swordEntR);
+    if (_genAnimState)
+        _genAnimState->setEnabled(false);
+
+    mSM->destroyAnimationState("sinbad_intro");
+    mSM->destroyAnimation("sinbad_intro");
+
+    delete _timer; _timer = nullptr;   // you were leaking this too
+
+    if (_swordEntL) mSM->destroyEntity(_swordEntL);
+    if (_swordEntR) mSM->destroyEntity(_swordEntR);
 }
 
 void AnimatedSinbad::update(double dt) {
@@ -90,25 +96,25 @@ void AnimatedSinbad::createAnimation() {
     addKeyFrame(_track, 0, Vector3::ZERO, 2);
 
     // turn
-    addKeyFrame(_track, 90, Vector3::ZERO, 3);
+    addKeyFrame(_track, 90, Vector3::ZERO, 2.25);
 
     // move far right & grab swords
-    addKeyFrame(_track, 90, Vector3::UNIT_X * _movLength, 5);
+    addKeyFrame(_track, 90, Vector3::UNIT_X * _movLength, 3.75);
     
     // turn 180
-    addKeyFrame(_track, 270, Vector3::UNIT_X * _movLength, 6);
+    addKeyFrame(_track, 270, Vector3::UNIT_X * _movLength, 4.25);
 
     // move far left
-    addKeyFrame(_track, 270, Vector3::NEGATIVE_UNIT_X * _movLength, 10);
+    addKeyFrame(_track, 270, Vector3::NEGATIVE_UNIT_X * _movLength, 7.25);
 
     // turn 180
-    addKeyFrame(_track, 450, Vector3::NEGATIVE_UNIT_X * _movLength, 11);
+    addKeyFrame(_track, 450, Vector3::NEGATIVE_UNIT_X * _movLength, 7.75);
 
     // move to center
-    addKeyFrame(_track, 450, Vector3::ZERO, 13);
+    addKeyFrame(_track, 450, Vector3::ZERO, 9.25);
 
     // turn
-    addKeyFrame(_track, 360, Vector3::ZERO, 14);
+    addKeyFrame(_track, 360, Vector3::ZERO, 9.5);
 }
 
 void AnimatedSinbad::addKeyFrame(NodeAnimationTrack* nodeAnimationTrack, float turnAngle, Vector3 move, float step) {

@@ -82,10 +82,16 @@ public:
     /// <returns></returns>
     std::pair<int, int> getBlockRowColFromPos(Vector2 position) const;
 
+    void setActive(bool a);
+
+    bool getActive();
+
 private:
     IG2Project* _ig2 = nullptr;
     int _numRows, _numCols; 
     std::string _wallMaterial;
+
+    bool _active = false;
     
     /// <summary>
     /// Position of the center of the labyrinth in world coordinates.
