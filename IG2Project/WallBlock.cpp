@@ -11,3 +11,7 @@ WallBlock::WallBlock(Vector3 initPos, SceneNode* node, SceneManager* sceneMng) :
 WallBlock::WallBlock(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh) : Block(initPos, node, sceneMng, mesh) {
 	_canPassThrough = false;
 }
+
+void WallBlock::update(Real time) {
+
+}

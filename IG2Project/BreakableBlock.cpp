@@ -16,3 +16,7 @@ void BreakableBlock::breakBlock() {
 	setVisible(false);
 	_canPassThrough = true;
 }
+
+void BreakableBlock::update(Real time) {
+
+}

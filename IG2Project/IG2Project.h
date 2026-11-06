@@ -22,6 +22,7 @@ class Character;
 class SpecialVillain;
 class GameInfoOverlay;
 class AnimatedSinbad;
+class Bomb;
 
 static const std::string MAP_NAME = "../../IG2Project/IG2Project/IG2Media/stage1b.txt";
 
@@ -48,6 +49,7 @@ protected:
     AnimatedSinbad* _introAnimation = nullptr;
     Player* _player = nullptr;
     Labyrinth* _labyrinth = nullptr;
+    Bomb* _bomb = nullptr;
     SpecialVillain* _villain = nullptr;
     GameInfoOverlay* _infoOverlay = nullptr;
 

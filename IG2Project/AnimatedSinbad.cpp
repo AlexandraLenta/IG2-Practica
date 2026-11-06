@@ -16,7 +16,6 @@ AnimatedSinbad::AnimatedSinbad(Vector3 initPos, Real moveLength, SceneNode* node
     _swordEntR->setVisible(false);
 
     createAnimation();
-    _timer = new Ogre::Timer();
 
     _genAnimState = mSM->createAnimationState("sinbad_intro");
     _genAnimState->setLoop(true);
@@ -42,42 +41,29 @@ AnimatedSinbad::~AnimatedSinbad() {
     mSM->destroyAnimationState("sinbad_intro");
     mSM->destroyAnimation("sinbad_intro");
 
-    delete _timer; _timer = nullptr;   // you were leaking this too
-
     if (_swordEntL) mSM->destroyEntity(_swordEntL);
     if (_swordEntR) mSM->destroyEntity(_swordEntR);
 }
 
 void AnimatedSinbad::update(double dt) {
     _genAnimState->addTime(dt);
+
+    // current step
+    float step = _genAnimState->getTimePosition() / _durStep;
     
+    bool walking = step >= _walkStartInstant && step < _danceStartInstant;
+    bool swords = walking && step >= _swordAppearInstant;
+
     for (auto* s : _walkAnimStates) {
-        if (s->getEnabled())
-            s->addTime(dt);
+        s->setEnabled(walking);
+        if (walking) s->addTime(dt);
     }
 
-    if (_danceAnimState->getEnabled())
-        _danceAnimState->addTime(dt);
+    _danceAnimState->setEnabled(!walking);
+    if (!walking) _danceAnimState->addTime(dt);
 
-    if (_danceAnimState->getEnabled() && _timer->getMilliseconds() >= _walkStartInstant * _durStep * 1000.f) {
-        for (auto* s : _walkAnimStates) {
-            s->setEnabled(true);
-        }
-        _danceAnimState->setEnabled(false);
-    }
-    else if (_walkAnimStates[0]->getEnabled() && _timer->getMilliseconds() >= _danceStartInstant * _durStep * 1000.f) {
-        for (auto* s : _walkAnimStates) {
-            s->setEnabled(false);
-        }
-        _danceAnimState->setEnabled(true);
-        _timer->reset();
-        _swordEntL->setVisible(false);
-        _swordEntR->setVisible(false);
-    }
-    else if (!_swordEntL->getVisible() && _walkAnimStates[0]->getEnabled() && _timer->getMilliseconds() >= _swordAppearInstant * _durStep * 1000.f) {
-        _swordEntL->setVisible(true);
-        _swordEntR->setVisible(true);
-    }
+    _swordEntL->setVisible(swords);
+    _swordEntR->setVisible(swords);
 }
 
 void AnimatedSinbad::createAnimation() {

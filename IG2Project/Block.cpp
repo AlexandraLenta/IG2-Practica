@@ -11,7 +11,3 @@ Block::Block(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String me
 bool Block::canPassThrough() const {
 	return _canPassThrough;
 }
-
-void Block::update(Real time) {
-
-}

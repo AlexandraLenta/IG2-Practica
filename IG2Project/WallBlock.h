@@ -25,5 +25,6 @@ public:
      * @param mesh Mesh that is applied to this element.
      */
     WallBlock(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh);
-};
 
+    void update(Real time) override;
+};

@@ -5,6 +5,7 @@
 #include <fstream>
 #include "GameInfoOverlay.h"
 #include "AnimatedSinbad.h"
+#include "Bomb.h"
 
 using namespace Ogre;
 
@@ -84,15 +85,6 @@ void IG2Project::setupScene(void) {
     setupLabyrinth();
 }
 
-void IG2Project::dumpNode(Ogre::SceneNode* n, int depth) {
-    std::cout << std::string(depth * 2, ' ') << n->getName()
-        << " pos=" << n->getPosition() << " scale=" << n->getScale() << "\n";
-    for (auto* o : n->getAttachedObjects())
-        std::cout << std::string(depth * 2 + 2, ' ') << "obj: " << o->getName() << "\n";
-    for (auto* c : n->getChildren())
-        dumpNode(static_cast<Ogre::SceneNode*>(c), depth + 1);
-}
-
 void IG2Project::setupLabyrinth() {
     createMap();
 }
@@ -157,6 +149,8 @@ void IG2Project::setupIntro() {
 
     mCamNode->setPosition(0, _introAnimation->calculateBoxSize().y, 40);
     mCamNode->lookAt(_introAnimation->getInitialPosition() + Vector3{ 0, _introAnimation->calculateBoxSize().y /2.f, 0}, Ogre::Node::TS_WORLD);
+
+    _bomb = new Bomb({0, 0, 0}, mSM->getRootSceneNode()->createChildSceneNode(), mSM);
 }
 
 void IG2Project::createEnvironment() {
@@ -233,6 +227,10 @@ void IG2Project::frameRendered(const Ogre::FrameEvent& evt) {
 
     if (_introAnimation != nullptr) {
         _introAnimation->update(evt.timeSinceLastFrame);
+    }
+
+    if (_bomb != nullptr) {
+        _bomb->update(evt.timeSinceLastFrame);
     }
 }
 

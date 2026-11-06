@@ -1,6 +1,5 @@
 #pragma once
 #include "IG2Object.h"
-#include <OgreTimer.h>
 
 class AnimatedSinbad : public IG2Object
 {
@@ -34,7 +33,6 @@ private:
     float _danceStartInstant = TIME_INSTANTS;
     float _walkStartInstant = 2; 
     float _swordAppearInstant = 3.75;
-    Ogre::Timer* _timer;
 
     Real _movLength;
 

@@ -11,3 +11,7 @@ EmptyBlock::EmptyBlock(Vector3 initPos, SceneNode* node, SceneManager* sceneMng)
 EmptyBlock::EmptyBlock(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh) : Block(initPos, node, sceneMng, mesh) {
 	_canPassThrough = true;
 }
+
+void EmptyBlock::update(Real time) {
+
+}

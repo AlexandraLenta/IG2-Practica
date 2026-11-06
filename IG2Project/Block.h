@@ -29,7 +29,7 @@ public:
 
     bool canPassThrough() const;
 
-    virtual void update(Real time);
+    virtual void update(Real time) = 0;
 
 protected:
     bool _canPassThrough;

@@ -11,3 +11,8 @@ FakeBlock::FakeBlock(Vector3 initPos, SceneNode* node, SceneManager* sceneMng) :
 FakeBlock::FakeBlock(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh) : Block(initPos, node, sceneMng, mesh) {
 	_canPassThrough = true;
 }
+
+
+void FakeBlock::update(Real time) {
+
+}
