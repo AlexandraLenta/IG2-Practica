@@ -150,7 +150,7 @@ void IG2Project::setupIntro() {
     mCamNode->setPosition(0, _introAnimation->calculateBoxSize().y, 40);
     mCamNode->lookAt(_introAnimation->getInitialPosition() + Vector3{ 0, _introAnimation->calculateBoxSize().y /2.f, 0}, Ogre::Node::TS_WORLD);
 
-    _bomb = new Bomb({0, 0, 0}, mSM->getRootSceneNode()->createChildSceneNode(), mSM);
+    //_bomb = new Bomb({-100, 0, 0}, mSM->getRootSceneNode()->createChildSceneNode(), mSM);
 }
 
 void IG2Project::createEnvironment() {

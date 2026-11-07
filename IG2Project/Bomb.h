@@ -6,21 +6,39 @@ class Bomb : public IG2Object
 {
 public:
 	const std::string BOMB_MESH = "sphere.mesh";
-	const float MAX_SCALE = 1.1;
-	const float MIN_SCALE = 0.9;
+	const std::string FUSE_MESH = "cube.mesh";
 	const float SCALE_TIME = 0.7; // time between max scale and min scale
+	const int FUSE_STEPS = 1;
+	
 	const Vector3 ORIGINAL_SCALE = Vector3{ 0.21, 0.21, 0.21 };
+	const Vector3 FUSE_SCALE = Vector3{ 0.02, 0.1, 0.02 };
 
-	Bomb(Vector3 initPos, SceneNode* node, SceneManager* sceneMng);
+	Bomb(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, float explodeTime = 5, float maxScale = 1.1, float minScale = 0.9);
 
 	~Bomb();
 
 	void update(double dt);
 private:
 	Ogre::Timer* _timer = nullptr;
-	float _stepDuration = SCALE_TIME;
+	float _scaleStepDuration = SCALE_TIME;
+	float _fuseStepDuration = _explodeTime / FUSE_STEPS;
+	
+	float _explodeTime;
+	float _minScale, _maxScale;
 
 	AnimationState* _scaleAnimation = nullptr;
+	AnimationState* _fuseAnimation = nullptr;
 
-	void addKeyFrame(NodeAnimationTrack* nodeAnimationTrack, float turnAngle, Vector3 move, Vector3 scale, float step);
+	Ogre::Entity* _fuseEntity = nullptr;
+	Ogre::SceneNode* _fuseNode = nullptr;
+	
+	Ogre::ParticleSystem* _fuseParticleSys = nullptr;
+	Ogre::SceneNode* _fuseParticleNode = nullptr;
+
+	void createBomb();
+	void createScaleAnimation();
+	void createParticleSys();
+	void createFuseAnimation();
+
+	void addKeyFrame(NodeAnimationTrack* nodeAnimationTrack, float turnAngle, Vector3 move, Vector3 scale, float step, float stepDuration);
 };

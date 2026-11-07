@@ -58,3 +58,39 @@ material game/tankTop {
 	}
     }
 }
+
+material game/bombBody {
+	technique {
+		pass {
+			ambient 0.0	0.0	0.0	
+			diffuse 0.01 0.01 0.01
+			specular 0.50 0.50 0.50	.25
+		}
+	}
+}
+
+material game/bombFuse {
+	technique {
+		pass {
+			ambient 0.2125 0.1275 0.054	
+			diffuse 0.714 0.4284 0.18144
+			specular 0.393548 0.271906 0.166721 0.2
+		}
+	}
+}
+
+material game/fuseSmoke {
+    technique{
+        pass{
+            lighting off
+            scene_blend alpha_blend
+            depth_write off
+            diffuse vertexcolour
+
+            texture_unit{
+                texture smoke.png
+                tex_address_mode clamp
+            }
+        }
+    }
+}
