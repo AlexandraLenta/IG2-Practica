@@ -95,8 +95,10 @@ public:
     /// <returns></returns>
     std::pair<int, int> getBlockRowColFromPos(Vector2 position) const;
 
+    void activate();
     void setActive(bool a);
     bool getActive();
+    
 
     void placeBomb();
 

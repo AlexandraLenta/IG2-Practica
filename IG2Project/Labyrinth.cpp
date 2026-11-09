@@ -146,6 +146,7 @@ void Labyrinth::createLabyrinth(std::istream& input, IG2Project* ig2) {
 
 	for (int i = 0; i < MAX_BOMBS; i++) {
 		_inactiveBombs[i] = new Bomb(Vector3{0, 0, 0}, createChildSceneNode(), mSM, i, BOMB_EXPLOSION_TIME);
+		_inactiveBombs[i]->setPosition({ 0, _inactiveBombs[i]->calculateBoxSize().y, 0 });
 		_inactiveBombs[i]->setVisible(false);
 		_inactiveBombs[i]->setExplodeCallback([this, i]() { onBombExplosion(); });
 	}
@@ -345,6 +346,17 @@ std::pair<int, int> Labyrinth::getLabyrinthSize() {
 	return { _numCols * BLOCK_SIZE, _numRows * BLOCK_SIZE };
 }
 
+void Labyrinth::activate() {
+	_active = true;
+	_player->setVisible(true);
+	setVisible(true);
+
+	for (auto& b : _inactiveBombs) {
+		b->setVisible(false); // bombs must stay invisible
+								// another solution would be to not have them be the children of the node
+	}
+}
+
 void Labyrinth::setActive(bool a) {
 	_active = a;
 	_player->setVisible(a);
@@ -362,13 +374,10 @@ void Labyrinth::placeBomb() {
 
 	_inactiveBombs.erase(_inactiveBombs.begin());
 
-	std::cout << _player->getPosition() << '\n';
+	Vector3 blockPos = getBlock(_player->getPosition())->getPosition();
 
-	b->setInitialPosition(getBlock(_player->getPosition())->getPosition());
-	b->setPosition(getBlock(_player->getPosition())->getPosition());
-
-	std::cout << b->getPosition() << '\n';
-	//std::cout << getBlock(_player->getPosition())->getPosition() << '\n';
+	b->setInitialPosition({blockPos.x, b->getPosition().y, blockPos.z});
+	b->setPosition({ blockPos.x, b->getPosition().y, blockPos.z });
 
 	b->initExplosion();
 

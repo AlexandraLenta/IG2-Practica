@@ -107,8 +107,7 @@ void IG2Project::startLabyrinth() {
     _infoOverlay->setPlayer(_player);
     _infoOverlay->updateGameInfo();
 
-    _labyrinth->setVisible(true);
-    _labyrinth->setActive(true);
+    _labyrinth->activate();
 }
  
 void IG2Project::setLabyrinthCamera() {
