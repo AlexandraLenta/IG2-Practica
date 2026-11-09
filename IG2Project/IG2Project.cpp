@@ -5,7 +5,6 @@
 #include <fstream>
 #include "GameInfoOverlay.h"
 #include "AnimatedSinbad.h"
-#include "Bomb.h"
 
 using namespace Ogre;
 
@@ -34,6 +33,9 @@ bool IG2Project::keyPressed(const OgreBites::KeyboardEvent& evt) {
     }
     else if ((evt.keysym.sym == SDLK_RIGHT || evt.keysym.sym == SDLK_d) && _labyrinth != nullptr && _labyrinth->getActive()) {
         _player->setNewDir(Player::RIGHT);
+    }
+    else if ((evt.keysym.sym == SDLK_x) && _labyrinth != nullptr && _labyrinth->getActive()) {
+        _labyrinth->placeBomb();
     }
     return true;
 }
@@ -149,8 +151,6 @@ void IG2Project::setupIntro() {
 
     mCamNode->setPosition(0, _introAnimation->calculateBoxSize().y, 40);
     mCamNode->lookAt(_introAnimation->getInitialPosition() + Vector3{ 0, _introAnimation->calculateBoxSize().y /2.f, 0}, Ogre::Node::TS_WORLD);
-
-    //_bomb = new Bomb({-100, 0, 0}, mSM->getRootSceneNode()->createChildSceneNode(), mSM);
 }
 
 void IG2Project::createEnvironment() {
@@ -227,10 +227,6 @@ void IG2Project::frameRendered(const Ogre::FrameEvent& evt) {
 
     if (_introAnimation != nullptr) {
         _introAnimation->update(evt.timeSinceLastFrame);
-    }
-
-    if (_bomb != nullptr) {
-        _bomb->update(evt.timeSinceLastFrame);
     }
 }
 

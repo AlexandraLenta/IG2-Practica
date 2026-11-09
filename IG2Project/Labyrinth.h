@@ -7,6 +7,7 @@
 class Character;
 class Block;
 class IG2Project;
+class Bomb;
 
 class Labyrinth :
     public IG2Object
@@ -29,6 +30,18 @@ public:
     static constexpr float POINT_LIGHT_HEIGHT = 5;
     static constexpr float SPOT_LIGHT_HEIGHT = 80;
     static constexpr float LIGHT_RANGE = 800;
+
+    /// <summary>
+    /// Reach of the bomb explosion in each direction
+    /// </summary>
+    static constexpr int BOMB_BLOCK_REACH = 4;
+
+    static constexpr int MAX_BOMBS = 5;
+
+    /// <summary>
+    /// Time it takes for bomb to explode, in seconds.
+    /// </summary>
+    static constexpr float BOMB_EXPLOSION_TIME = 5;
 
     enum BlockType {
         EMPTY,
@@ -83,8 +96,9 @@ public:
     std::pair<int, int> getBlockRowColFromPos(Vector2 position) const;
 
     void setActive(bool a);
-
     bool getActive();
+
+    void placeBomb();
 
 private:
     IG2Project* _ig2 = nullptr;
@@ -101,14 +115,17 @@ private:
     std::vector<std::vector<Block*>> _blocks;
     
     /// <summary>
+    /// Pointer to the player. To be switched for a vector<Character*> if there are multiple players.
+    /// </summary>
+    Character* _player = nullptr;
+
+    /// <summary>
     /// Holds pointers to ALL characters (player(s) included)
     /// </summary>
     std::vector<Character*> _characters;
 
-    /// <summary>
-    /// Pointer to the player. To be switched for a vector<Character*> if there are multiple players.
-    /// </summary>
-    Character* _player = nullptr;
+    std::vector<Bomb*> _activeBombs;
+    std::vector<Bomb*> _inactiveBombs;
 
     Light* _light = nullptr;
     Ogre::SceneNode* _lightNode = nullptr;
@@ -149,7 +166,7 @@ private:
     /// <param name="time">Delta time.</param>
     void updateBlocks(Real time);
 
-    void updateLight();
+    void updateBombs(Real time);
 
     /// <summary>
     /// Update all characters.
@@ -171,4 +188,6 @@ private:
     /// What to do in case of player death.
     /// </summary>
     void onPlayerDeath();
+
+    void onBombExplosion();
 };

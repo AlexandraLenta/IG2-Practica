@@ -8,11 +8,12 @@
 #include "SpecialVillain.h"
 #include "SimpleVillain.h"
 #include "GameInfoOverlay.h"
+#include "Bomb.h"
 
 Labyrinth::Labyrinth() : IG2Object() {
 }
 
-Labyrinth::Labyrinth(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, int rows, int cols, std::string wallMaterial, std::istream& input, IG2Project* ig2) : IG2Object(initPos, node, sceneMng), _ig2(ig2), _numRows(rows), _numCols(cols), _wallMaterial(wallMaterial) {
+Labyrinth::Labyrinth(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, int rows, int cols, std::string wallMaterial, std::istream& input, IG2Project* ig2) : IG2Object(initPos, node, sceneMng), _ig2(ig2), _numRows(rows), _numCols(cols), _wallMaterial(wallMaterial), _inactiveBombs(MAX_BOMBS) {
 	createLabyrinth(input, ig2);
 }
 
@@ -40,8 +41,6 @@ void Labyrinth::createLight(std::string type) {
 
 	_lightNode = _player->createChildSceneNode();
 	_lightNode->attachObject(_light);
-
-	//mSM->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_STENCIL_MODULATIVE); // more beautiful shadows, laggy
 
 	if (type == POINT_LIGHT) {
 		_light->setType(Light::LightTypes::LT_POINT);
@@ -144,6 +143,12 @@ void Labyrinth::createLabyrinth(std::istream& input, IG2Project* ig2) {
 		nextPos.z += BLOCK_SIZE;
 		nextPos.x = _labyrinthOrigin.x;
 	}
+
+	for (int i = 0; i < MAX_BOMBS; i++) {
+		_inactiveBombs[i] = new Bomb(Vector3{0, 0, 0}, createChildSceneNode(), mSM, i, BOMB_EXPLOSION_TIME);
+		_inactiveBombs[i]->setVisible(false);
+		_inactiveBombs[i]->setExplodeCallback([this, i]() { onBombExplosion(); });
+	}
 }
 
 Block* Labyrinth::createBlock(Vector3 pos, BlockType type) {
@@ -167,7 +172,6 @@ Block* Labyrinth::createBlock(Vector3 pos, BlockType type) {
 		blockObj = new BreakableBlock(pos, block, mSM);
 		break;
 	}
-
 	
 	if (blockObj->hasEntity()) {
 		blockObj->setScale(getCubeResizeScale(blockObj));
@@ -261,6 +265,14 @@ void Labyrinth::updateLabyrinth(Real time) {
 	moveCharacters(time);
 
 	checkPlayerVillainsCollisions();
+
+	updateBombs(time);
+}
+
+void Labyrinth::updateBombs(Real time) {
+	for (auto& b : _activeBombs) {
+		b->update(time);
+	}
 }
 
 void Labyrinth::updateBlocks(Real time) {
@@ -329,7 +341,6 @@ std::pair<int, int> Labyrinth::getBlockRowColFromPos(Vector2 position) const {
 	return { row, col };
 }
 
-
 std::pair<int, int> Labyrinth::getLabyrinthSize() {
 	return { _numCols * BLOCK_SIZE, _numRows * BLOCK_SIZE };
 }
@@ -341,4 +352,33 @@ void Labyrinth::setActive(bool a) {
 
 bool Labyrinth::getActive() {
 	return _active;
+}
+
+void Labyrinth::placeBomb() {
+	if (_inactiveBombs.empty())
+		return;
+
+	Bomb* b = _inactiveBombs.front();
+
+	_inactiveBombs.erase(_inactiveBombs.begin());
+
+	std::cout << _player->getPosition() << '\n';
+
+	b->setInitialPosition(getBlock(_player->getPosition())->getPosition());
+	b->setPosition(getBlock(_player->getPosition())->getPosition());
+
+	std::cout << b->getPosition() << '\n';
+	//std::cout << getBlock(_player->getPosition())->getPosition() << '\n';
+
+	b->initExplosion();
+
+	_activeBombs.push_back(b);
+}
+
+void Labyrinth::onBombExplosion() {
+	Bomb* b = _activeBombs.front(); // the first bomb in the list is the one placed longer ago
+	
+	_activeBombs.erase(_activeBombs.begin());
+
+	_inactiveBombs.push_back(b);
 }
