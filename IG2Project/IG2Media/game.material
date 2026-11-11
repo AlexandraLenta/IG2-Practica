@@ -79,7 +79,7 @@ material game/bombFuse {
 	}
 }
 
-material game/fuseSmoke {
+material game/smoke {
     technique{
         pass{
             lighting off

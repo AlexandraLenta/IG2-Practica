@@ -75,7 +75,6 @@ private:
     void createLabyrinthFloor();
     void setLabyrinthCamera();
     void startLabyrinth();
-    void dumpNode(Ogre::SceneNode* n, int depth = 0);
 };
 
 #endif

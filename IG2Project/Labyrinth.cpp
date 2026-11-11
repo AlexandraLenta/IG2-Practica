@@ -9,6 +9,7 @@
 #include "SimpleVillain.h"
 #include "GameInfoOverlay.h"
 #include "Bomb.h"
+#include "OgreParticleSystem.h"
 
 Labyrinth::Labyrinth() : IG2Object() {
 }
@@ -29,6 +30,11 @@ Labyrinth::~Labyrinth() {
 	}
 
 	_characters.clear();
+
+	for (int i = 0; i < _smokeParticleSystems.size(); i++) {
+		std::string sysName = SMOKE_NAME + std::to_string(i);
+		mSM->destroyParticleSystem(sysName);
+	}
 }
 
 Character* Labyrinth::getPlayer() const {
@@ -62,6 +68,8 @@ void Labyrinth::createLight(std::string type) {
 }
 
 void Labyrinth::createLabyrinth(std::istream& input, IG2Project* ig2) {
+	_smokeParticleSystems = std::vector<ParticleSystem*>(_numRows * _numCols);
+
 	int iRow = 0, iCol = 0;
 	char cell;
 
@@ -86,12 +94,18 @@ void Labyrinth::createLabyrinth(std::istream& input, IG2Project* ig2) {
 			}
 			else if (cell == EMPTY_BLOCK) {
 				block = createBlock(nextPos, EMPTY);
+
+				int index = iRow * _numCols + iCol;
+				_smokeParticleSystems[index] = createSmokeSystem(index, nextPos);
 			}
 			else if (cell == INVISIBLE_BLOCK) {
 				block = createBlock(nextPos, INVISIBLE);
 			}
 			else if (cell == FAKE_BLOCK) {
 				block = createBlock(nextPos, FAKE);
+
+				int index = iRow * _numCols + iCol;
+				_smokeParticleSystems[index] = createSmokeSystem(index, nextPos);
 			}
 			else if (cell == BREAKABLE_BLOCK) {
 				block = createBlock(nextPos, BREAKABLE);
@@ -108,6 +122,9 @@ void Labyrinth::createLabyrinth(std::istream& input, IG2Project* ig2) {
 
 				_characters.push_back(_player);
 				createLight(lightType);
+				
+				int index = iRow * _numCols + iCol;
+				_smokeParticleSystems[index] = createSmokeSystem(index, nextPos);
 			}
 			else if (cell == VILLAIN_NORMAL) {
 				block = createBlock(nextPos, EMPTY); // donde esta el jugador solo puede haber un bloque vacio
@@ -119,6 +136,9 @@ void Labyrinth::createLabyrinth(std::istream& input, IG2Project* ig2) {
 				Character* villain = new SimpleVillain(villainPos, createChildSceneNode(), mSM);
 				villain->setLabyrinth(this);
 				_characters.push_back(villain);
+
+				int index = iRow * _numCols + iCol;
+				_smokeParticleSystems[index] = createSmokeSystem(index, nextPos);
 			}
 			else if (cell == VILLAIN_SPECIAL) {
 				block = createBlock(nextPos, EMPTY); // donde esta el jugador solo puede haber un bloque vacio
@@ -132,6 +152,9 @@ void Labyrinth::createLabyrinth(std::istream& input, IG2Project* ig2) {
 				villain->setLabyrinth(this);
 
 				_characters.push_back(villain);
+
+				int index = iRow * _numCols + iCol;
+				_smokeParticleSystems[index] = createSmokeSystem(index, nextPos);
 			}
 
 			_blocks[iRow][iCol] = block;
@@ -180,6 +203,18 @@ Block* Labyrinth::createBlock(Vector3 pos, BlockType type) {
 	}
 
 	return blockObj;
+}
+
+ParticleSystem* Labyrinth::createSmokeSystem(int idx, Vector3 pos) {
+	Ogre::SceneNode* node = mNode->createChildSceneNode(pos);
+
+	std::string sysName = SMOKE_NAME + std::to_string(idx);
+	ParticleSystem* p = mSM->createParticleSystem(sysName, SMOKE_MATERIAL);
+	p->setEmitting(false);
+
+	node->attachObject(p);
+
+	return p;
 }
 
 Vector3 Labyrinth::getCubeResizeScale(IG2Object* cube) {
@@ -271,7 +306,8 @@ void Labyrinth::updateLabyrinth(Real time) {
 }
 
 void Labyrinth::updateBombs(Real time) {
-	for (auto& b : _activeBombs) {
+	auto bombs = _activeBombs;   // callbacks might modify _activeBombs, so we copy
+	for (auto* b : bombs) {
 		b->update(time);
 	}
 }
@@ -296,22 +332,22 @@ void Labyrinth::checkPlayerVillainsCollisions() {
 		if (villain != _player) {
 			if (_player->getAABB().intersects(villain->getAABB())) {
 				_player->hurt();
-				if (_player->getLife() <= 0) {
-					onPlayerDeath();
-				}
-				else {
-					onPlayerHurt();
-				}
+				onPlayerHurt();
 			}
 		}
 	}
 }
 
 void Labyrinth::onPlayerHurt() {
-	_player->setPosition(_player->getInitialPosition());
+	if (_player->getLife() <= 0) {
+		onPlayerDeath();
+	}
+	else {
+		_player->setPosition(_player->getInitialPosition());
 
-	if (_ig2)
-		_ig2->updateInfo();
+		if (_ig2)
+			_ig2->updateInfo();
+	}
 }
 
 void Labyrinth::onPlayerDeath() {
@@ -386,8 +422,82 @@ void Labyrinth::placeBomb() {
 
 void Labyrinth::onBombExplosion() {
 	Bomb* b = _activeBombs.front(); // the first bomb in the list is the one placed longer ago
-	
+
 	_activeBombs.erase(_activeBombs.begin());
 
 	_inactiveBombs.push_back(b);
+
+	auto pos = getBlockRowColFromPos({ b->getPosition().x, b->getPosition().z });
+
+	ParticleSystem* p = _smokeParticleSystems[pos.first * _numCols + pos.second];
+
+	if (p)
+		startSmoke(p);
+
+
+	std::vector<std::pair<int, int>> affected;
+	affected.push_back(pos);
+
+	for (auto& dir : DIRECTIONS) {
+		std::pair<int, int> newPos = pos;
+
+		for (int i = 0; i < BOMB_BLOCK_REACH; i++) {
+			newPos.first += dir.first;
+			newPos.second += dir.second;
+
+			if (newPos.first < 0 || newPos.first >= _numRows || newPos.second < 0 || newPos.second >= _numCols) {
+				break;
+			}
+
+			ParticleSystem* p = _smokeParticleSystems[newPos.first * _numCols + newPos.second];
+			
+			// if there is no particle system in this direction, it doesn't keep extending
+			if (!p)
+				break;
+
+			startSmoke(p);
+			affected.push_back(newPos);
+		}
+	}
+
+	handleSmokeCollisions(affected);
+}
+
+void Labyrinth::startSmoke(ParticleSystem* p) {
+	p->clear();
+	p->setEmitting(true);
+}
+
+void Labyrinth::handleSmokeCollisions(const std::vector<std::pair<int, int>>& affected) {
+	bool playerHit = false;
+
+	for (auto it = _characters.begin(); it != _characters.end();) {
+		Block* charBlock = getBlock((*it)->getPosition());
+
+		bool inSmoke = false;
+
+		for (auto& pos : affected) {
+			if (_blocks[pos.first][pos.second] == charBlock) {
+				inSmoke = true;
+				break;
+			}
+		}
+
+		if (inSmoke) {
+			if (*it == _player) {
+				playerHit = true;
+			}
+			else {
+				delete* it;
+				it = _characters.erase(it);
+				continue;
+			}
+		}
+		++it;
+	}
+
+	if (playerHit) {
+		_player->hurt(); 
+		onPlayerHurt();
+	}
 }

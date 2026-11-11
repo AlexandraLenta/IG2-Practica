@@ -36,7 +36,15 @@ public:
     /// </summary>
     static constexpr int BOMB_BLOCK_REACH = 4;
 
+    /// <summary>
+    /// Maximum amount of blocks the player can place in the scene.
+    /// </summary>
     static constexpr int MAX_BOMBS = 5;
+
+    const std::vector<std::pair<int, int>> DIRECTIONS = { { 0, 1 }, {1, 0}, {0, -1}, {-1, 0} };
+
+    const std::string SMOKE_NAME = "labyrinth_smoke";
+    const std::string SMOKE_MATERIAL = "game/smokeParticle";
 
     /// <summary>
     /// Time it takes for bomb to explode, in seconds.
@@ -128,6 +136,7 @@ private:
 
     std::vector<Bomb*> _activeBombs;
     std::vector<Bomb*> _inactiveBombs;
+    std::vector<ParticleSystem*> _smokeParticleSystems;
 
     Light* _light = nullptr;
     Ogre::SceneNode* _lightNode = nullptr;
@@ -151,6 +160,8 @@ private:
     /// <param name="type">The type of the block.</param>
     /// <returns>Pointer to the block object.</returns>
     Block* createBlock(Vector3 pos, BlockType type);
+
+    ParticleSystem* createSmokeSystem(int idx, Vector3 pos);
 
     Vector3 getCubeResizeScale(IG2Object* cube);
 
@@ -192,4 +203,8 @@ private:
     void onPlayerDeath();
 
     void onBombExplosion();
+
+    void startSmoke(ParticleSystem* p);
+
+    void handleSmokeCollisions(const std::vector<std::pair<int, int>>& affected);
 };

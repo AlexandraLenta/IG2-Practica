@@ -150,6 +150,7 @@ void Bomb::endExplosion() {
     setVisible(false);
 
     _fuseParticleSys->setEmitting(false);
+    _fuseParticleSys->clear();
 
     _scaleAnimation->setEnabled(false);
     _fuseAnimation->setEnabled(false);

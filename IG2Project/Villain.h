@@ -7,7 +7,7 @@ class Villain :
     public Character
 {
 public:
-    Villain(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, float sp = 10, int l = 3);
+    Villain(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, float sp = 10, int l = 1);
 
     void update(Real time) override;
 
