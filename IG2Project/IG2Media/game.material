@@ -94,3 +94,24 @@ material game/smoke {
         }
     }
 }
+
+material game/lavaFloor {
+    technique{
+       pass{
+         texture_unit {
+         	texture blackRock.jpg
+         }
+
+         texture_unit {
+         	texture alphaMask.png
+         	colour_op alpha_blend
+         }
+
+         texture_unit {
+         	texture lava.jpg
+            scroll_anim 0.015 0.008
+         	colour_op_ex blend_current_alpha src_texture src_current
+         }
+       }
+    }
+ }

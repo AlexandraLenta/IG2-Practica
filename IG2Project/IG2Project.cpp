@@ -94,6 +94,13 @@ void IG2Project::setupLabyrinth() {
 void IG2Project::startLabyrinth() {
     mSM->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
 
+    // SKY
+    Ogre::Plane plane;
+    plane.d = 500;
+    plane.normal = Ogre::Vector3::UNIT_Y;
+
+    mSM->setSkyPlane(true, plane, "game/sky", 100, 4, true, 0.2f, 50, 50);
+
     delete _introAnimation;
     _introAnimation = nullptr;
     mSM->destroyEntity("intro_floor");
@@ -156,16 +163,13 @@ void IG2Project::createEnvironment() {
     // FLOOR
     MeshManager::getSingleton().createPlane("intro_floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
         Plane(Vector3::UNIT_Y, 0),
-        INTRO_FLOOR_SIZE.first, INTRO_FLOOR_SIZE.second, 50, 50, true, 1, 5, 5,
+        INTRO_FLOOR_SIZE.first, INTRO_FLOOR_SIZE.second, 1, 1, true, 1, 1, 1,
         Vector3::UNIT_Z);
 
     Entity* entFloor = mSM->createEntity("intro_floor", "intro_floor");
-    entFloor->setMaterialName("game/intro_floor");
+    entFloor->setMaterialName("game/lavaFloor");
     SceneNode* floorNode = mSM->getRootSceneNode()->createChildSceneNode();
     floorNode->attachObject(entFloor);
-
-    // SKY
-    mSM->setSkyBox(true, "Examples/SpaceSkyBox", 5000);
 }
 
 void IG2Project::createMap() {

@@ -63,7 +63,7 @@ protected:
 
 private:
     const int LABYRINTH_DISTANCE_Y = 400;
-    const std::pair<int, int> INTRO_FLOOR_SIZE = { 300, 150 };
+    const std::pair<int, int> INTRO_FLOOR_SIZE = { 150, 75 };
 
     void setupIntro();
     void setupLabyrinth();

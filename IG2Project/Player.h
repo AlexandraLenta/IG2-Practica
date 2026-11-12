@@ -10,6 +10,10 @@ public:
     void setPoints(int p);
 
     Ogre::Vector3 chooseDirection() override;
+
+    void update(Real dt) override;
 private:
     int _points;
+
+    std::vector<AnimationState*> _walkAnimStates;
 };
