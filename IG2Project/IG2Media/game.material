@@ -34,6 +34,7 @@ material game/sky {
 			lighting off
 			texture_unit {
 				texture spaceSky.jpg
+            	scroll_anim 0.015 0.008
 			}
 		}
 	}
