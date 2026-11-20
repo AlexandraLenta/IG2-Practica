@@ -30,6 +30,7 @@ public:
     InvisibleBlock(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh);
 
     void update(Real time) override;
+    void hit() override;
 
 private:
     bool _isVisible = false;

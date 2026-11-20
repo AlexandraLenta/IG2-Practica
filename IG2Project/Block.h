@@ -31,6 +31,8 @@ public:
 
     virtual void update(Real time) = 0;
 
+    virtual void hit() = 0;
+
 protected:
     bool _canPassThrough;
 };

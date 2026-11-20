@@ -15,3 +15,6 @@ EmptyBlock::EmptyBlock(Vector3 initPos, SceneNode* node, SceneManager* sceneMng,
 void EmptyBlock::update(Real time) {
 
 }
+
+void EmptyBlock::hit() {
+}

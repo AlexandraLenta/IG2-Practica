@@ -12,7 +12,7 @@ BreakableBlock::BreakableBlock(Vector3 initPos, SceneNode* node, SceneManager* s
 	_canPassThrough = false;
 }
 
-void BreakableBlock::breakBlock() {
+void BreakableBlock::hit() {
 	setVisible(false);
 	_canPassThrough = true;
 }

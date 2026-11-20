@@ -109,6 +109,9 @@ void Labyrinth::createLabyrinth(std::istream& input, IG2Project* ig2) {
 			}
 			else if (cell == BREAKABLE_BLOCK) {
 				block = createBlock(nextPos, BREAKABLE);
+
+				int index = iRow * _numCols + iCol;
+				_smokeParticleSystems[index] = createSmokeSystem(index, nextPos);
 			}
 			else if (cell == HERO) {
 				block = createBlock(nextPos, EMPTY); // donde esta el jugador solo puede haber un bloque vacio
@@ -454,6 +457,8 @@ void Labyrinth::onBombExplosion() {
 			// if there is no particle system in this direction, it doesn't keep extending
 			if (!p)
 				break;
+
+			_blocks[newPos.first][newPos.second]->hit();
 
 			startSmoke(p);
 			affected.push_back(newPos);

@@ -25,3 +25,6 @@ void InvisibleBlock::update(Real time) {
 		setVisible(_isVisible);
 	}
 }
+
+void InvisibleBlock::hit() {
+}

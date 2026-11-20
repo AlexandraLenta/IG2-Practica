@@ -15,3 +15,6 @@ WallBlock::WallBlock(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, S
 void WallBlock::update(Real time) {
 
 }
+
+void WallBlock::hit() {
+}

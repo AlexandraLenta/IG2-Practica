@@ -27,5 +27,6 @@ public:
     FakeBlock(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh);
 
     void update(Real time) override;
+    void hit() override;
 };
 

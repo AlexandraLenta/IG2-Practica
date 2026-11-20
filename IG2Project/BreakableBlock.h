@@ -27,7 +27,7 @@ public:
      */
     BreakableBlock(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh);
 
-    void breakBlock();
+    void hit() override;
 
     void update(Real time) override;
 };

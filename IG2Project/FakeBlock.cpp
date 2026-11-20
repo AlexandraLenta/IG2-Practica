@@ -16,3 +16,6 @@ FakeBlock::FakeBlock(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, S
 void FakeBlock::update(Real time) {
 
 }
+
+void FakeBlock::hit() {
+}
