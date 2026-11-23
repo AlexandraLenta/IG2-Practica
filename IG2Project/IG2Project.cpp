@@ -94,16 +94,12 @@ void IG2Project::setupLabyrinth() {
 void IG2Project::startLabyrinth() {
     mSM->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
 
-    // SKY
-    Ogre::Plane plane;
-    plane.d = 500;
-    plane.normal = Ogre::Vector3::UNIT_Y;
-
-    mSM->setSkyPlane(true, plane, "game/sky", 100, 4, true, 0.2f, 50, 50);
-
     delete _introAnimation;
     _introAnimation = nullptr;
     mSM->destroyEntity("intro_floor");
+
+    _skyPlane.normal = Ogre::Vector3::UNIT_Y;
+    mSM->setSkyPlane(true, _skyPlane, "game/sky", 100, 4, true, 0.8f, 50, 50);
 
     createOverlay();
 
@@ -127,7 +123,6 @@ void IG2Project::createCamera() {
     cam->setNearClipDistance(1);
     cam->setFarClipDistance(10000);
     cam->setAutoAspectRatio(true);
-    //cam->setPolygonMode(Ogre::PM_WIREFRAME);
 
     mCamNode = mSM->getRootSceneNode()->createChildSceneNode("nCam");
     mCamNode->attachObject(cam);
@@ -160,7 +155,7 @@ void IG2Project::setupIntro() {
 }
 
 void IG2Project::createEnvironment() {
-    // FLOOR
+    // FLOOR -- replaced by labyrinth
     MeshManager::getSingleton().createPlane("intro_floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
         Plane(Vector3::UNIT_Y, 0),
         INTRO_FLOOR_SIZE.first, INTRO_FLOOR_SIZE.second, 1, 1, true, 1, 1, 1,
@@ -170,6 +165,12 @@ void IG2Project::createEnvironment() {
     entFloor->setMaterialName("game/lavaFloor");
     SceneNode* floorNode = mSM->getRootSceneNode()->createChildSceneNode();
     floorNode->attachObject(entFloor);
+
+    // SKY -- replaced by labyrinth
+    _skyPlane.d = 2000;
+    _skyPlane.normal = Ogre::Vector3::UNIT_Z;
+
+    mSM->setSkyPlane(true, _skyPlane, "game/spaceSkyZoomShader", 50, 1, true, 0.8f, 50, 50);
 }
 
 void IG2Project::createMap() {

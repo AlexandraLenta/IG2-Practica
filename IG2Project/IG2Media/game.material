@@ -33,7 +33,7 @@ material game/sky {
 		pass {
 			lighting off
 			texture_unit {
-				texture spaceSky.jpg
+				texture spaceSky2.png
             	scroll_anim 0.015 0.008
 			}
 		}
@@ -116,3 +116,49 @@ material game/lavaFloor {
        }
     }
  }
+
+ //////////////////////////////////////////////
+//// Sky with texture zooming
+//////////////////////////////////////////////
+
+vertex_program game/spaceSkyZoomVS glsl{
+
+    source spaceSkyZoomVS.glsl
+    default_params{
+       param_named_auto modelViewProjectionMatrix worldviewproj_matrix
+       param_named_auto timeZoom sintime_0_2pi 16
+    }
+}
+
+fragment_program game/spaceSkyZoomFS glsl{
+
+    source spaceSkyZoomFS.glsl
+    default_params{
+       param_named tex0 int 0
+	   param_named tex1 int 1
+    }
+}
+
+material game/spaceSkyZoomShader{
+
+    technique{
+    
+        pass{
+                vertex_program_ref game/spaceSkyZoomVS {
+                }
+                
+                fragment_program_ref game/spaceSkyZoomFS {
+                }
+                
+                texture_unit {
+                    texture lightMap.jpg
+					tex_address_mode clamp
+                }
+
+				texture_unit {
+                    texture spaceSky2.png
+					tex_address_mode clamp
+                }
+            }
+    }
+}

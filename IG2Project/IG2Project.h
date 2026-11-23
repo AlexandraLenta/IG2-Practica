@@ -60,6 +60,7 @@ protected:
     OgreBites::CameraMan* mCamMgr = nullptr;
 
     std::string _floorMaterial;
+    Ogre::Plane _skyPlane;
 
 private:
     const int LABYRINTH_DISTANCE_Y = 400;
