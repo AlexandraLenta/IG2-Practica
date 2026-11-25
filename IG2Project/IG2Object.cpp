@@ -16,15 +16,29 @@ IG2Object::IG2Object(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, S
     this->setPosition(initialPosition);
 }
 
-IG2Object::~IG2Object() {
+void IG2Object::destroyNodeTree(Ogre::SceneNode* node) {
+    Ogre::SceneManager* sm = node->getCreator();
 
-    this->removeEntity();
+    // destroy children (recursive, so destroy children of children...)
+    while (node->numChildren() > 0)
+        destroyNodeTree(static_cast<Ogre::SceneNode*>(node->getChild(0)));
 
-    if (mNode != nullptr) {
-        mSM->destroySceneNode(mNode);
-        mNode = nullptr;
+    // destroy anything attached to this node
+    while (node->numAttachedObjects() > 0) {
+        Ogre::MovableObject* o = node->getAttachedObject(0);
+        node->detachObject(o);
+        sm->destroyMovableObject(o);
     }
 
+    sm->destroySceneNode(node);
+}
+
+IG2Object::~IG2Object() {
+    if (mNode != nullptr) {
+        destroyNodeTree(mNode);
+        mNode = nullptr;
+    }
+    entity = nullptr;
     mSM = nullptr;
 }
 

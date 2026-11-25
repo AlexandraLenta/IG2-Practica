@@ -42,7 +42,7 @@ public:
     /**
      * Destructor
      */
-    ~IG2Object();
+    virtual ~IG2Object();
 
     /**
      * Creates a child scene node.
@@ -160,6 +160,7 @@ public:
 
 
 protected:
+    void destroyNodeTree(Ogre::SceneNode* node);
 
     // Scene node representing this element in the scene
     SceneNode* mNode = nullptr;

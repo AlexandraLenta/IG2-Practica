@@ -41,8 +41,10 @@ AnimatedSinbad::~AnimatedSinbad() {
     mSM->destroyAnimationState("sinbad_intro");
     mSM->destroyAnimation("sinbad_intro");
 
-    if (_swordEntL) mSM->destroyEntity(_swordEntL);
-    if (_swordEntR) mSM->destroyEntity(_swordEntR);
+    entity->detachObjectFromBone(_swordEntL);
+    entity->detachObjectFromBone(_swordEntR);
+    mSM->destroyEntity(_swordEntL);
+    mSM->destroyEntity(_swordEntR);
 }
 
 void AnimatedSinbad::update(double dt) {

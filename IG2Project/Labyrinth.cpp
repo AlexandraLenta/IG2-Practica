@@ -32,9 +32,14 @@ Labyrinth::~Labyrinth() {
 	_characters.clear();
 
 	for (int i = 0; i < _smokeParticleSystems.size(); i++) {
-		std::string sysName = SMOKE_NAME + std::to_string(i);
-		mSM->destroyParticleSystem(sysName);
+		if (_smokeParticleSystems[i])
+			mSM->destroyParticleSystem(SMOKE_NAME + std::to_string(i));
 	}
+
+	for (auto* b : _inactiveBombs) delete b;
+	for (auto* b : _activeBombs)   delete b;
+	_inactiveBombs.clear();
+	_activeBombs.clear();
 }
 
 Character* Labyrinth::getPlayer() const {
