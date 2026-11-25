@@ -101,6 +101,9 @@ Ogre::Vector2 SpecialVillain::bfs(std::vector<std::vector<Block*>> blocks, std::
 	if (origin == target)
 		return Ogre::Vector2::ZERO;
 
+	if (origin.first < 0 || target.first < 0)
+		return Ogre::Vector2::ZERO;
+
 	const int rows = blocks.size(), cols = blocks[0].size();
 
 	std::vector<std::vector<bool>> visited(blocks.size(), std::vector<bool>(blocks[0].size(), false));
@@ -130,6 +133,8 @@ Ogre::Vector2 SpecialVillain::bfs(std::vector<std::vector<Block*>> blocks, std::
 			}
 		}
 	}
+
+	return Ogre::Vector2::ZERO;
 }
 
 bool SpecialVillain::isBlockValid(int i, int j, int ROWS, int COLS) {
