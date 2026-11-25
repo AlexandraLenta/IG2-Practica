@@ -23,7 +23,7 @@ material game/labyrinth_floor {
 	pass {  
 	    texture_unit {
             texture grass.png
-          }
+        }
 	}
     }
 }
@@ -117,7 +117,7 @@ material game/lavaFloor {
     }
  }
 
- //////////////////////////////////////////////
+//////////////////////////////////////////////
 //// Sky with texture zooming
 //////////////////////////////////////////////
 
@@ -157,6 +157,98 @@ material game/spaceSkyZoomShader{
 
 				texture_unit {
                     texture spaceSky2.png
+					tex_address_mode clamp
+                }
+            }
+    }
+}
+
+//////////////////////////////////////////////
+//// Wobble floor 
+//////////////////////////////////////////////
+
+vertex_program game/wobbleVS glsl{
+
+    source wobbleVS.glsl
+    default_params{
+       param_named_auto modelViewProjectionMatrix worldviewproj_matrix
+       param_named_auto time time
+       param_named amplitude float 0.3
+       param_named frequency float 2
+    }
+}
+
+fragment_program game/wobbleFS glsl{
+
+    source wobbleFS.glsl
+    default_params{
+       param_named tex0 int 0
+    }
+}
+
+material game/wobbleFloorShader {
+
+    technique{
+    
+        pass{
+            lighting off
+            cull_hardware none
+
+            vertex_program_ref game/wobbleVS {
+            }
+            
+            fragment_program_ref game/wobbleFS {
+            }
+
+            texture_unit {
+                texture lava.jpg
+            }
+        }
+    }
+}
+
+//////////////////////////////////////////////
+//// Sphere 
+//////////////////////////////////////////////
+
+vertex_program game/sphereLambertFragmentVS glsl{
+
+    source sphereLambertFragmentVS.glsl
+    default_params{
+       param_named_auto modelViewProjectionMatrix worldviewproj_matrix
+       param_named_auto timeZoom sintime_0_2pi 16
+    }
+}
+
+fragment_program game/sphereLambertFragmentFS glsl{
+
+    source sphereLambertFragmentFS.glsl
+    default_params{
+       param_named tex0 int 0
+	   param_named tex1 int 1
+    }
+}
+
+material game/emptySphereShader {
+
+    technique{
+    
+        pass{
+            cull_hardware none
+            cull_software none
+                vertex_program_ref game/sphereLambertFragmentVS {
+                }
+                
+                fragment_program_ref game/sphereLambertFragmentFS {
+                }
+                
+                texture_unit {
+                    texture blackRock.jpg
+					tex_address_mode clamp
+                }
+
+				texture_unit {
+                    texture lava.jpg
 					tex_address_mode clamp
                 }
             }

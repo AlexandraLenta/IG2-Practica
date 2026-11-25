@@ -158,11 +158,11 @@ void IG2Project::createEnvironment() {
     // FLOOR -- replaced by labyrinth
     MeshManager::getSingleton().createPlane("intro_floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
         Plane(Vector3::UNIT_Y, 0),
-        INTRO_FLOOR_SIZE.first, INTRO_FLOOR_SIZE.second, 1, 1, true, 1, 1, 1,
+        INTRO_FLOOR_SIZE.first, INTRO_FLOOR_SIZE.second, 40, 20, true, 1, 1, 1,
         Vector3::UNIT_Z);
 
     Entity* entFloor = mSM->createEntity("intro_floor", "intro_floor");
-    entFloor->setMaterialName("game/lavaFloor");
+    entFloor->setMaterialName("game/wobbleFloorShader");
     SceneNode* floorNode = mSM->getRootSceneNode()->createChildSceneNode();
     floorNode->attachObject(entFloor);
 
