@@ -239,7 +239,7 @@ void IG2Project::createLabyrinthFloor() {
 }
 
 Character* IG2Project::createPlayer(Vector3 position) {
-    _player = new Player(position, mSM->getRootSceneNode()->createChildSceneNode("player"), mSM, "Sinbad.mesh");
+    _player = new Player(position, mSM->getRootSceneNode()->createChildSceneNode("player"), mSM, "Sinbad.mesh", 18);
     _player->setInitialPosition({ _player->getPosition().x, _player->getPosition().y + _player->calculateBoxSize().y / 2.f, _player->getPosition().z });
     _player->setPosition(_player->getInitialPosition());
 
