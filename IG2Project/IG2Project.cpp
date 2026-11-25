@@ -43,6 +43,13 @@ bool IG2Project::keyPressed(const OgreBites::KeyboardEvent& evt) {
 
 void IG2Project::shutdown() {
     delete _labyrinth; _labyrinth = nullptr;
+    
+    delete _infoOverlay; _infoOverlay = nullptr;
+    
+    if (_introAnimation) {
+        delete _introAnimation;
+        _introAnimation = nullptr;
+    }
 
     mShaderGenerator->removeSceneManager(mSM);
     mSM->removeRenderQueueListener(mOverlaySystem);
@@ -51,7 +58,6 @@ void IG2Project::shutdown() {
 
     delete mTrayMgr;  mTrayMgr = nullptr;
     delete mCamMgr; mCamMgr = nullptr;
-    delete _infoOverlay; _infoOverlay = nullptr;
 
     // do not forget to call the base 
     OgreBites::ApplicationContext::shutdown();
@@ -96,7 +102,13 @@ void IG2Project::startLabyrinth() {
 
     delete _introAnimation;
     _introAnimation = nullptr;
-    mSM->destroyEntity("intro_floor");
+    mSM->destroyEntity(INTRO_FLOOR_NAME);
+    _introFloorNode = nullptr;
+    Ogre::MeshManager::getSingleton().remove(INTRO_FLOOR_NAME);
+
+    mSM->destroyEntity("intro_sphere");
+    mSM->destroySceneNode(_sphereNode);
+    _sphereNode = nullptr;
 
     _skyPlane.normal = Ogre::Vector3::UNIT_Y;
     mSM->setSkyPlane(true, _skyPlane, "game/sky", 100, 4, true, 0.8f, 50, 50);
@@ -143,6 +155,14 @@ void IG2Project::createLights() {
 
     auto* vp = getRenderWindow()->getViewport(0);
     vp->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+
+    Ogre::Light* light = mSM->createLight("sphereLight");
+    light->setType(Ogre::Light::LT_DIRECTIONAL);
+    light->setDiffuseColour(1.0f, 1.0f, 1.0f);
+
+    Ogre::SceneNode* lightNode = mSM->getRootSceneNode()->createChildSceneNode();
+    lightNode->attachObject(light);
+    lightNode->setDirection(Ogre::Vector3(0, -1, 0.2f));
 }
 
 void IG2Project::setupIntro() {
@@ -156,21 +176,29 @@ void IG2Project::setupIntro() {
 
 void IG2Project::createEnvironment() {
     // FLOOR -- replaced by labyrinth
-    MeshManager::getSingleton().createPlane("intro_floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+    MeshManager::getSingleton().createPlane(INTRO_FLOOR_NAME, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
         Plane(Vector3::UNIT_Y, 0),
         INTRO_FLOOR_SIZE.first, INTRO_FLOOR_SIZE.second, 40, 20, true, 1, 1, 1,
         Vector3::UNIT_Z);
 
-    Entity* entFloor = mSM->createEntity("intro_floor", "intro_floor");
+    Entity* entFloor = mSM->createEntity(INTRO_FLOOR_NAME, INTRO_FLOOR_NAME);
     entFloor->setMaterialName("game/wobbleFloorShader");
-    SceneNode* floorNode = mSM->getRootSceneNode()->createChildSceneNode();
-    floorNode->attachObject(entFloor);
+    _introFloorNode = mSM->getRootSceneNode()->createChildSceneNode();
+    _introFloorNode->attachObject(entFloor);
 
     // SKY -- replaced by labyrinth
     _skyPlane.d = 2000;
     _skyPlane.normal = Ogre::Vector3::UNIT_Z;
 
     mSM->setSkyPlane(true, _skyPlane, "game/spaceSkyZoomShader", 50, 1, true, 0.8f, 50, 50);
+
+    _sphereNode = mSM->getRootSceneNode()->createChildSceneNode("sphere");
+    Ogre::Entity* ent = mSM->createEntity("intro_sphere", "uv_sphere.mesh");
+    ent->setMaterialName("game/emptySphereShader");
+
+    _sphereNode->attachObject(ent);
+    _sphereNode->setScale(SPHERE_SCALE);
+    _sphereNode->setPosition(SPHERE_POS);
 }
 
 void IG2Project::createMap() {

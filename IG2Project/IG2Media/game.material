@@ -216,7 +216,7 @@ vertex_program game/sphereLambertFragmentVS glsl{
     source sphereLambertFragmentVS.glsl
     default_params{
        param_named_auto modelViewProjectionMatrix worldviewproj_matrix
-       param_named_auto timeZoom sintime_0_2pi 16
+       param_named_auto normalMatrix normal_matrix
     }
 }
 
@@ -224,8 +224,10 @@ fragment_program game/sphereLambertFragmentFS glsl{
 
     source sphereLambertFragmentFS.glsl
     default_params{
-       param_named tex0 int 0
-	   param_named tex1 int 1
+       param_named texCoor int 0
+	   param_named texInside int 1
+       param_named_auto flipping render_target_flipping
+       param_named_auto lightDir light_direction_view_space 0
     }
 }
 
@@ -242,15 +244,15 @@ material game/emptySphereShader {
                 fragment_program_ref game/sphereLambertFragmentFS {
                 }
                 
+				texture_unit {
+                    texture lava.jpg
+					tex_address_mode clamp
+                }
                 texture_unit {
                     texture blackRock.jpg
 					tex_address_mode clamp
                 }
 
-				texture_unit {
-                    texture lava.jpg
-					tex_address_mode clamp
-                }
             }
     }
 }

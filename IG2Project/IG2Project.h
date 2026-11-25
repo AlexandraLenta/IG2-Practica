@@ -59,12 +59,18 @@ protected:
     Ogre::SceneNode* mCamNode = nullptr;
     OgreBites::CameraMan* mCamMgr = nullptr;
 
+    Ogre::SceneNode* _sphereNode = nullptr;
+    Ogre::SceneNode* _introFloorNode = nullptr;
+
     std::string _floorMaterial;
     Ogre::Plane _skyPlane;
 
 private:
     const int LABYRINTH_DISTANCE_Y = 400;
     const std::pair<int, int> INTRO_FLOOR_SIZE = { 150, 75 };
+    const std::string INTRO_FLOOR_NAME = "intro_floor";
+    const Ogre::Vector3 SPHERE_POS = { 0, 5, -20 };
+    const Ogre::Vector3 SPHERE_SCALE = { 0.05, 0.05, 0.05 };
 
     void setupIntro();
     void setupLabyrinth();
